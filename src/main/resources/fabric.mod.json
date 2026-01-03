@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "ballistics",
+	"version": "${version}",
+	"name": "ballistics",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/ballistics/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"llevc.ballistics.Ballistics"
+		],
+		"client": [
+			"llevc.ballistics.BallisticsClient"
+		],
+		"fabric-datagen": [
+			"llevc.ballistics.BallisticsDataGenerator"
+		]
+	},
+	"mixins": [
+		"ballistics.mixins.json",
+		{
+			"config": "ballistics.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
