@@ -1,14 +1,15 @@
 {
-	"required": true,
-	"package": "llevc.ballistics.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-      "FireworkMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
+  "required": true,
+  "package": "llevc.ballistics.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "FireworkMixin",
+    "ItemDropMomentumMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
 	}
 }
