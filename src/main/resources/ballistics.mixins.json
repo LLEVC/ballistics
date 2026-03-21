@@ -3,6 +3,7 @@
   "package": "llevc.ballistics.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BottleItemMixin",
     "FireworkItemMixin",
     "FireworkMixin",
     "ItemDropMomentumMixin",

@@ -19,6 +19,7 @@ public class Ballistics implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
+		ModItems.initialize();
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}
 }
