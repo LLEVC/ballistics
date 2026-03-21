@@ -35,7 +35,11 @@ public abstract class ItemDropMomentumMixin {
     @Inject(at=@At("RETURN"),method="createItemStackToDrop", cancellable = true)
     public void init(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
         ItemEntity itemEntity = cir.getReturnValue();
-        Vec3 deltaata = Objects.requireNonNull(this.asLivingEntity()).getKnownMovement();
+        LivingEntity bih = Objects.requireNonNull(this.asLivingEntity());
+        Vec3 deltaata = bih.getKnownMovement();
+        if (bih.isFallFlying()) {
+            deltaata = deltaata.add(bih.getDeltaMovement().multiply(0.5,0.5,0.5));
+        }
         if (itemEntity != null) {
             Vec3 ogVelo = itemEntity.getDeltaMovement();
             itemEntity.addDeltaMovement(deltaata);

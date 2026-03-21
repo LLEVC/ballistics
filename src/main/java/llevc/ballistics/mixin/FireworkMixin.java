@@ -58,23 +58,27 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 
 	@Unique
 	public void fireworkHit(ServerLevel serverLevel, Operation<Void> original) {
-		if (this.isShotAtAngle()) {
-			jump(serverLevel, this.getOwner());
-		}
-		for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0))) {
-			List<FireworkExplosion> freaky = this.getExplosions();
-			Vec3 direction = (livingEntity.position().subtract(this.position()));
-			ClipContext heyosssa = new ClipContext(this.position().add(0,this.getBoundingBox().getYsize(),0),(livingEntity.position().add(0,livingEntity.getBoundingBox().getYsize()/2,0)), ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,serverLevel.getEntity(this.uuid));
-			HitResult hitResult = serverLevel.clip(heyosssa);
-			float sh = 5.0f + freaky.size() * 2.0f;
-			boolean hit = false;
-			if (hitResult.getType() == HitResult.Type.MISS) {
-				hit = true;
+		if (!this.getExplosions().isEmpty()) {
+			if (this.isShotAtAngle() ) {
+				jump(serverLevel, this.getOwner());
 			}
-			if (hit && (!livingEntity.is(getOwner()) || !this.isShotAtAngle())) {
-				float damag = Math.round(sh * Math.sqrt(( (5*freaky.size()) - (direction.length() + ((3.5*freaky.size())-3.5)) ) / (freaky.size()*(3-((freaky.size()-1.0)/6)))));
-				livingEntity.hurtServer(serverLevel,damageSources().fireworks((FireworkRocketEntity) serverLevel.getEntity(this.uuid),getOwner()), damag);
-				Ballistics.LOGGER.info(String.valueOf(damag));
+			for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0))) {
+				if (livingEntity.isAlive()) {
+					List<FireworkExplosion> freaky = this.getExplosions();
+					Vec3 direction = (livingEntity.position().subtract(this.position()));
+					ClipContext heyosssa = new ClipContext(this.position().add(0, this.getBoundingBox().getYsize(), 0), (livingEntity.position().add(0, livingEntity.getBoundingBox().getYsize() / 2, 0)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, serverLevel.getEntity(this.uuid));
+					HitResult hitResult = serverLevel.clip(heyosssa);
+					float sh = 5.0f + freaky.size() * 2.0f;
+					boolean hit = false;
+					if (hitResult.getType() == HitResult.Type.MISS) {
+						hit = true;
+					}
+					if (hit && (!livingEntity.is(getOwner()) || !this.isShotAtAngle())) {
+						float damag = Math.round(sh * Math.sqrt(((5 * freaky.size()) - (direction.length() + ((3.5 * freaky.size()) - 3.5))) / (freaky.size() * (3 - ((freaky.size() - 1.0) / 6)))));
+						livingEntity.hurtServer(serverLevel, damageSources().fireworks((FireworkRocketEntity) serverLevel.getEntity(this.uuid), getOwner()), damag);
+						Ballistics.LOGGER.info(String.valueOf(damag));
+					}
+				}
 			}
 		}
 		//original.call(serverLevel);
