@@ -2,5 +2,7 @@
   "item.ballistics.empty_flask": "Empty Flask",
   "item.ballistics.dragon_flask": "Dragon Breath Flask",
   "item.ballistics.flask.effect.empty": "Flask of Water",
-  "item.ballistics.rh_glove": "Rocket Handling Glove"
+  "item.ballistics.rh_glove": "Rocket Handling Glove",
+  "itemGroup.ballistics": "Ballistics",
+  "item.ballistics.prick": "Prick"
 }

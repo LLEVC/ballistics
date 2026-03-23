@@ -12,9 +12,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.level.ClipContext;
@@ -23,11 +20,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalInt;
 
 @Mixin(FireworkRocketEntity.class)
@@ -72,24 +67,28 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 	@Unique
 	public void fireworkHit(ServerLevel serverLevel, Operation<Void> original) {
 		if (!this.getExplosions().isEmpty()) {
-			if (this.isShotAtAngle() ) {
+			if (this.isShotAtAngle()) {
 				jump(serverLevel, this.getOwner());
 			}
-			for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0))) {
-				if (livingEntity.isAlive()) {
-					List<FireworkExplosion> freaky = this.getExplosions();
-					Vec3 direction = (livingEntity.position().subtract(this.position()));
-					ClipContext heyosssa = new ClipContext(this.position().add(0, this.getBoundingBox().getYsize(), 0), (livingEntity.position().add(0, livingEntity.getBoundingBox().getYsize() / 2, 0)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, serverLevel.getEntity(this.uuid));
-					HitResult hitResult = serverLevel.clip(heyosssa);
-					float sh = 5.0f + freaky.size() * 2.0f;
-					boolean hit = false;
-					if (hitResult.getType() == HitResult.Type.MISS) {
-						hit = true;
-					}
-					if (hit && (!livingEntity.is(getOwner()) || !this.isShotAtAngle())) {
-						float damag = Math.round(sh * Math.sqrt(((5 * freaky.size()) - (direction.length() + ((3.5 * freaky.size()) - 3.5))) / (freaky.size() * (3 - ((freaky.size() - 1.0) / 6)))));
-						livingEntity.hurtServer(serverLevel, damageSources().fireworks((FireworkRocketEntity) serverLevel.getEntity(this.uuid), getOwner()), damag);
-						Ballistics.LOGGER.info(String.valueOf(damag));
+			List<LivingEntity> wsg = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0));
+			if (!wsg.isEmpty()) {
+				for (LivingEntity livingEntity : wsg) {
+					if (livingEntity.isAlive()) {
+						List<FireworkExplosion> freaky = this.getExplosions();
+						Vec3 direction = (livingEntity.position().subtract(this.position()));
+						Entity thisentity = Objects.requireNonNullElse(serverLevel.getEntity(this.uuid),this.getOwner());
+						ClipContext heyosssa = new ClipContext(this.position().add(0, this.getBoundingBox().getYsize(), 0), (livingEntity.position().add(0, livingEntity.getBoundingBox().getYsize() / 2, 0)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, thisentity);
+						HitResult hitResult = serverLevel.clip(heyosssa);
+						float sh = 5.0f + freaky.size() * 2.0f;
+						boolean hit = false;
+						if (hitResult.getType() == HitResult.Type.MISS) {
+							hit = true;
+						}
+						if (hit && (!livingEntity.is(getOwner()) || !this.isShotAtAngle())) {
+							float damag = Math.round(sh * Math.sqrt(((5 * freaky.size()) - (direction.length() + ((3.5 * freaky.size()) - 3.5))) / (freaky.size() * (3 - ((freaky.size() - 1.0) / 6)))));
+							livingEntity.hurtServer(serverLevel, damageSources().fireworks((FireworkRocketEntity) serverLevel.getEntity(this.uuid), getOwner()), damag);
+							Ballistics.LOGGER.info(String.valueOf(damag));
+						}
 					}
 				}
 			}
@@ -108,7 +107,6 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 
 	@Unique
 	private int themticks = 5;
-	private boolean heyoo = false;
 
 	@WrapMethod(method = "tick")
 	public void init(Operation<Void> original) {

@@ -1,0 +1,45 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": [
+          "thirdperson_righthand",
+          "firstperson_righthand"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "ballistics:item/glove/right"
+        }
+      },
+      {
+        "when": [
+          "firstperson_lefthand",
+          "thirdperson_lefthand"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "ballistics:item/glove/left"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:select",
+      "property": "minecraft:main_hand",
+      "cases": [
+        {
+          "when": "left",
+          "model": {
+            "type": "minecraft:model",
+            "model": "ballistics:item/glove/left"
+          }
+        }
+      ],
+      "fallback": {
+        "type": "minecraft:model",
+        "model": "ballistics:item/glove/right"
+      }
+    }
+  }
+}

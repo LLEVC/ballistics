@@ -33,6 +33,7 @@ public class ModItems {
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsItemGroupKey,BallisticsItemGroup);
         ItemGroupEvents.modifyEntriesEvent(BallisticsItemGroupKey).register(itemGroup -> {
             itemGroup.accept(rhGlove);
+            itemGroup.accept(Prick);
             itemGroup.accept(EmptyFlask);
             itemGroup.accept(DragonsFlask);
             itemGroup.accept(Flask);
@@ -61,7 +62,12 @@ public class ModItems {
     public static final Item rhGlove = register(
             "rh_glove", //stands for Rocket Handling Glove btw
             Item::new,
-            new Item.Properties()
+            new Item.Properties().stacksTo(1)
+    );
+    public static final Item Prick = register(
+            "prick",
+            SelfDamageItem::new,
+            new Item.Properties().useCooldown(2.0f)
     );
 
     public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "item_group"));
