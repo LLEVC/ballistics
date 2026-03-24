@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:iron_ingot",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:leather"
+  ],
+  "result": {
+    "id": "ballistics:rh_glove"
+  }
+}

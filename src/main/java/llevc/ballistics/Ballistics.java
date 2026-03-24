@@ -2,6 +2,12 @@ package llevc.ballistics;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.ArmorDyeRecipe;
+import net.minecraft.world.item.crafting.CustomRecipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +26,9 @@ public class Ballistics implements ModInitializer {
 		// Proceed with mild caution.
 
 		ModItems.initialize();
+
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlaskRecipeSerializer.ID, FlaskRecipeSerializer.INSTANCE);
+
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}
 }

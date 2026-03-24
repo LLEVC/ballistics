@@ -14,10 +14,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BottleItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.ClipContext;
@@ -57,8 +54,7 @@ public class BottleItemMixin extends Item {
                             level.gameEvent(player, GameEvent.FLUID_PICKUP, blockPos);
 
                             Ballistics.LOGGER.info("booom");
-                            ItemStack newItem = ModItems.Flask.getDefaultInstance();
-                            newItem.set(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+                            ItemStack newItem = PotionContents.createItemStack(ModItems.Flask,Potions.WATER);
                             return InteractionResult.SUCCESS.heldItemTransformedTo(newItem);
                         }
                     }

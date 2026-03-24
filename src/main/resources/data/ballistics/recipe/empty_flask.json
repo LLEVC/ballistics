@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "aba",
+    " a "
+  ],
+  "key": {
+    "a": "minecraft:iron_ingot",
+    "b": "minecraft:glass_bottle"
+  },
+  "result": {
+    "id": "ballistics:empty_flask"
+  }
+}

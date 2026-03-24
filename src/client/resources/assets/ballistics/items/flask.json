@@ -1,0 +1,21 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "ballistics:item/flask"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "ballistics:item/flask_label",
+        "tints": [
+          {
+            "type": "minecraft:potion",
+            "default": 16249843
+          }
+        ]
+      }
+    ]
+  }
+}

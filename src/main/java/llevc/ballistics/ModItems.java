@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
@@ -36,7 +37,7 @@ public class ModItems {
             itemGroup.accept(Prick);
             itemGroup.accept(EmptyFlask);
             itemGroup.accept(DragonsFlask);
-            itemGroup.accept(Flask);
+            itemGroup.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
         });
     }
 
