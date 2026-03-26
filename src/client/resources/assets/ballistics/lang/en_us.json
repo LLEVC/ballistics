@@ -1,6 +1,17 @@
 {
   "item.ballistics.empty_flask": "Empty Flask",
   "item.ballistics.dragon_flask": "Dragon Breath Flask",
+  "item.ballistics.rh_glove": "Rocket Handling Glove",
+  "itemGroup.ballistics": "Ballistics",
+  "itemGroup.ballistics_flasks": "Ballistics Flasks",
+  "item.ballistics.prick": "Prick",
+  "item.ballistics.drink_mixer": "Drink Mixer",
+
+  "item.minecraft.potion.effect.mixed": "Mixed Potion",
+  "item.minecraft.splash_potion.effect.mixed": "Mixed Splash Potion",
+  "item.minecraft.lingering_potion.effect.mixed": "Mixed Lingering Potion",
+  "item.minecraft.tipped_arrow.effect.mixed": "Mixed Arrow",
+  "item.ballistics.flask.effect.mixed": "Mixed Flask",
 
   "item.ballistics.flask": "Flask",
   "item.ballistics.flask.effect.awkward": "Awkward Flask",
@@ -28,9 +39,5 @@
   "item.ballistics.flask.effect.water_breathing": "Flask of Water Breathing",
   "item.ballistics.flask.effect.weakness": "Flask of Weakness",
   "item.ballistics.flask.effect.weaving": "Flask of Weaving",
-  "item.ballistics.flask.effect.wind_charged": "Flask of Wind Charging",
-  
-  "item.ballistics.rh_glove": "Rocket Handling Glove",
-  "itemGroup.ballistics": "Ballistics",
-  "item.ballistics.prick": "Prick"
+  "item.ballistics.flask.effect.wind_charged": "Flask of Wind Charging"
 }

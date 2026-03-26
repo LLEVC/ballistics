@@ -1,0 +1,6 @@
+{
+  "parent": "ballistics:item/generated_double",
+  "textures": {
+    "layer0": "ballistics:item/drink_mixer"
+  }
+}

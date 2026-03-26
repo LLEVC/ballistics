@@ -28,6 +28,8 @@ public class Ballistics implements ModInitializer {
 		ModItems.initialize();
 
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlaskRecipeSerializer.ID, FlaskRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, DrinkMixerRecipeSerializer.ID, DrinkMixerRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, MixedDrinkRecipeSerializer.ID, MixedDrinkRecipeSerializer.INSTANCE);
 
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}

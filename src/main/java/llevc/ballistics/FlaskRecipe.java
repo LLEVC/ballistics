@@ -34,6 +34,17 @@ public class FlaskRecipe extends CustomRecipe {
                 } else if (itemStack.is(ModItems.EmptyFlask) && flask) {
                     return false;
                 }
+            } else if (itemStack.is(ModItems.Flask) || itemStack.is(Items.GLASS_BOTTLE)) {
+                if (itemStack.is(ModItems.Flask) && itemStack.getOrDefault(DataComponents.RARITY,Rarity.COMMON).equals(Rarity.COMMON) && !potion) {
+                    potion = true;
+                } else if (itemStack.is(ModItems.Flask) && potion) {
+                    return false;
+                }
+                if (itemStack.is(Items.GLASS_BOTTLE) && !flask) {
+                    flask = true;
+                } else if (itemStack.is(Items.GLASS_BOTTLE) && flask) {
+                    return false;
+                }
             } else {
                 return false;
             }
