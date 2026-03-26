@@ -57,10 +57,14 @@ public class FlaskRecipe extends CustomRecipe {
         ItemStack potion = ItemStack.EMPTY;
         boolean flask = false;
         boolean overflow = false;
+        boolean type = false;
+        boolean typeSet = false;
 
         for (int i = 0; i < recipeInput.size(); i++) {
             ItemStack itemStack = recipeInput.getItem(i);
-            if (itemStack.is(ModItems.EmptyFlask) || itemStack.is(Items.POTION)) {
+            if ((itemStack.is(ModItems.EmptyFlask) || itemStack.is(Items.POTION)) && (!type || !typeSet)) {
+                typeSet = true;
+                type = false;
                 if (itemStack.is(Items.POTION) && potion.isEmpty()) {
                     potion = itemStack;
                 } else if (itemStack.is(Items.POTION) && !potion.isEmpty()) {
@@ -71,15 +75,17 @@ public class FlaskRecipe extends CustomRecipe {
                 } else if (itemStack.is(ModItems.EmptyFlask) && flask) {
                     overflow = true;
                 }
-            } else if (itemStack.is(Items.GLASS_BOTTLE) || itemStack.is(ModItems.Flask)) {
-                if (itemStack.is(Items.POTION) && potion.isEmpty()) {
+            } else if ((itemStack.is(Items.GLASS_BOTTLE) || itemStack.is(ModItems.Flask)) && (type || !typeSet)) {
+                typeSet = true;
+                type = true;
+                if (itemStack.is(ModItems.Flask) && potion.isEmpty()) {
                     potion = itemStack;
-                } else if (itemStack.is(Items.POTION) && !potion.isEmpty()) {
+                } else if (itemStack.is(ModItems.Flask) && !potion.isEmpty()) {
                     overflow = true;
                 }
-                if (itemStack.is(ModItems.EmptyFlask) && !flask) {
+                if (itemStack.is(Items.GLASS_BOTTLE) && !flask) {
                     flask = true;
-                } else if (itemStack.is(ModItems.EmptyFlask) && flask) {
+                } else if (itemStack.is(Items.GLASS_BOTTLE) && flask) {
                     overflow = true;
                 }
             } else if (!itemStack.isEmpty()) {
