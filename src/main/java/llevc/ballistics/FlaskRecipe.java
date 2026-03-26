@@ -71,6 +71,17 @@ public class FlaskRecipe extends CustomRecipe {
                 } else if (itemStack.is(ModItems.EmptyFlask) && flask) {
                     overflow = true;
                 }
+            } else if (itemStack.is(Items.GLASS_BOTTLE) || itemStack.is(ModItems.Flask)) {
+                if (itemStack.is(Items.POTION) && potion.isEmpty()) {
+                    potion = itemStack;
+                } else if (itemStack.is(Items.POTION) && !potion.isEmpty()) {
+                    overflow = true;
+                }
+                if (itemStack.is(ModItems.EmptyFlask) && !flask) {
+                    flask = true;
+                } else if (itemStack.is(ModItems.EmptyFlask) && flask) {
+                    overflow = true;
+                }
             } else if (!itemStack.isEmpty()) {
                 overflow = true;
             }

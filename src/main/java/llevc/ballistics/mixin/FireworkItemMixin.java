@@ -19,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 
+import java.util.Objects;
+
 @Mixin(FireworkRocketItem.class)
 public class FireworkItemMixin extends Item {
     public FireworkItemMixin(Properties properties) {
@@ -41,6 +43,10 @@ public class FireworkItemMixin extends Item {
                 Projectile.spawnProjectile(new FireworkRocketEntity(level, itemStack, player), serverLevel, itemStack);
                 itemStack.consume(1, player);
                 player.awardStat(Stats.ITEM_USED.get(this));
+
+                if (player.getItemBySlot(oppositeHand).is(ModItems.rhGlove)) {
+                    player.getItemBySlot(oppositeHand).hurtAndBreak(1, Objects.requireNonNull(player.asLivingEntity()),oppositeHand);
+                }
             }
 
             return InteractionResult.SUCCESS;
