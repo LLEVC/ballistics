@@ -95,7 +95,11 @@ public class FlaskRecipe extends CustomRecipe {
 
         if (!potion.isEmpty() && flask && !overflow) {
             Holder<Potion> death = Objects.requireNonNull(potion.get(DataComponents.POTION_CONTENTS)).potion().orElse(Potions.WATER);
-            result = PotionContents.createItemStack(ModItems.Flask, death);
+            if (type) {
+                result = PotionContents.createItemStack(Items.POTION, death);
+            } else {
+                result = PotionContents.createItemStack(ModItems.Flask, death);
+            }
         }
 
         return result;
