@@ -7,7 +7,9 @@
     "FireworkItemMixin",
     "FireworkMixin",
     "ItemDropMomentumMixin",
-    "ItemEntityMixin"
+    "ItemEntityMixin",
+    "PotionBrewingMixin",
+    "PotionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -54,7 +54,7 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 			if (direction.length() < sh/2.0f) {
 				double ayo = Math.clamp(Math.abs((sh / (direction.length()*10) + (1.5 * freaky.size())) * freaky.size()),0, Math.round(10 * Math.sqrt(freaky.size()))/2.0)/3.5;
 				Vec3 yo = direction.normalize().multiply(ayo,ayo,ayo);
-				Ballistics.LOGGER.info(yo.toString());
+				//Ballistics.LOGGER.info(yo.toString());
 				double damag = 1 + (freaky.size()*freaky.size());
 				//Ballistics.LOGGER.info(String.valueOf(damag));
 				owner.hurtServer(world,damageSources().fireworks((FireworkRocketEntity) world.getEntity(this.uuid),owner), (float) damag);

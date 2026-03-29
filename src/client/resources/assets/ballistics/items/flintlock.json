@@ -1,0 +1,30 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "component": "minecraft:custom_data",
+    "cases": [
+      {
+        "when": {
+          "charged": true
+        },
+        "model": {
+          "type": "minecraft:model",
+          "model": "ballistics:item/flintlock_primed"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:condition",
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "ballistics:item/flintlock"
+      },
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "ballistics:item/flintlock_half_primed"
+      },
+      "property": "minecraft:using_item"
+    },
+    "property": "minecraft:component"
+  }
+}

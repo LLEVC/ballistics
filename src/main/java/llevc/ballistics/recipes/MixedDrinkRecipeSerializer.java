@@ -1,4 +1,4 @@
-package llevc.ballistics;
+package llevc.ballistics.recipes;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,16 +11,16 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.NotNull;
 
-public class DrinkMixerRecipeSerializer implements RecipeSerializer<DrinkMixerRecipe> {
-    public static final DrinkMixerRecipeSerializer INSTANCE = new DrinkMixerRecipeSerializer(DrinkMixerRecipe::new);
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("ballistics","crafting_special_drink_mixer");
+public class MixedDrinkRecipeSerializer implements RecipeSerializer<MixedDrinkRecipe> {
+    public static final MixedDrinkRecipeSerializer INSTANCE = new MixedDrinkRecipeSerializer(MixedDrinkRecipe::new);
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("ballistics","crafting_special_mixed_drink");
 
 
 
-    private final MapCodec<DrinkMixerRecipe> codec;
-    private final StreamCodec<RegistryFriendlyByteBuf, DrinkMixerRecipe> streamCodec;
+    private final MapCodec<MixedDrinkRecipe> codec;
+    private final StreamCodec<RegistryFriendlyByteBuf, MixedDrinkRecipe> streamCodec;
 
-    public DrinkMixerRecipeSerializer(CustomRecipe.Serializer.Factory<DrinkMixerRecipe> factory) {
+    public MixedDrinkRecipeSerializer(CustomRecipe.Serializer.Factory<MixedDrinkRecipe> factory) {
         this.codec = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(CraftingRecipe::category))
                         .apply(instance, factory::create)
@@ -29,12 +29,12 @@ public class DrinkMixerRecipeSerializer implements RecipeSerializer<DrinkMixerRe
     }
 
     @Override
-    public @NotNull MapCodec<DrinkMixerRecipe> codec() {
+    public @NotNull MapCodec<MixedDrinkRecipe> codec() {
         return codec;
     }
 
     @Override
-    public @NotNull StreamCodec<RegistryFriendlyByteBuf, DrinkMixerRecipe> streamCodec() {
+    public @NotNull StreamCodec<RegistryFriendlyByteBuf, MixedDrinkRecipe> streamCodec() {
         return streamCodec;
     }
 }

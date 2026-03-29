@@ -1,5 +1,6 @@
 package llevc.ballistics;
 
+import llevc.ballistics.items.FlintlockItem;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Holder;
@@ -10,19 +11,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.component.Consumables;
-import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
-import net.minecraft.world.item.consume_effects.ConsumeEffect;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -40,11 +35,11 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(BallisticsItemGroupKey).register(itemGroup -> {
             itemGroup.accept(rhGlove);
+            itemGroup.accept(Flintlock);
             itemGroup.accept(DrinkMixer);
             itemGroup.accept(EmptyFlask);
             itemGroup.accept(DragonsFlask);
             itemGroup.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
-            itemGroup.accept(Prick);
         });
         ItemGroupEvents.modifyEntriesEvent(BallisticsFlaskItemGroupKey).register(itemGroup -> {
             itemGroup.accept(DrinkMixer);
@@ -92,10 +87,10 @@ public class ModItems {
             Item::new,
             new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15)
     );
-    public static final Item Prick = register(
-            "prick",
-            SelfDamageItem::new,
-            new Item.Properties().useCooldown(2.0f)
+    public static final Item Flintlock = register(
+            "flintlock",
+            FlintlockItem::new,
+            new Item.Properties().durability(24).enchantable(1).repairable(ItemTags.REPAIRS_IRON_ARMOR)
     );
 
     public static final Potion MixedPotion = Registry.register(

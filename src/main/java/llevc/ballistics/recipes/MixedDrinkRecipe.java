@@ -1,15 +1,13 @@
-package llevc.ballistics;
+package llevc.ballistics.recipes;
 
-import net.minecraft.core.Holder;
+import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
@@ -68,15 +66,20 @@ public class MixedDrinkRecipe extends CustomRecipe {
 
         Iterable<MobEffectInstance> what = mixer.get(DataComponents.POTION_CONTENTS).getAllEffects();
         List<MobEffectInstance> bbl = new java.util.ArrayList<>(List.of());
+        double level = 0;
         for (MobEffectInstance mobEffectInstance : what) {
             MobEffectInstance newEffect = mobEffectInstance.withScaledDuration((float) 1 / flasks);
             bbl.add(newEffect);
+            level = level+1+mobEffectInstance.getAmplifier();
         }
 
         PotionContents huh = new PotionContents(Optional.of(BuiltInRegistries.POTION.wrapAsHolder(ModItems.MixedPotion)),Optional.empty(),bbl,Optional.empty());
         ItemStack wowwie = new ItemStack(ModItems.Flask);
         wowwie.set(DataComponents.POTION_CONTENTS,huh);
         wowwie.setCount(flasks);
+        if (level > 2*(2+bbl.size())) {
+            wowwie.set(DataComponents.RARITY, Rarity.RARE);
+        }
         result = wowwie;
 
         return result;

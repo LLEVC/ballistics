@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "ballistics:rh_glove"
+    "ballistics:rh_glove",
+    "ballistics:flintlock"
   ]
 }

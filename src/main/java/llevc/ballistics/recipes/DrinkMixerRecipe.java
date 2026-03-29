@@ -1,29 +1,20 @@
-package llevc.ballistics;
+package llevc.ballistics.recipes;
 
-import net.minecraft.core.Holder;
+import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.util.CommonColors;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
 
-import java.awt.*;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class DrinkMixerRecipe extends CustomRecipe {
@@ -38,6 +29,9 @@ public class DrinkMixerRecipe extends CustomRecipe {
         for (int i = 0; i < recipeInput.size(); i++) {
             ItemStack itemStack = recipeInput.getItem(i);
             if (itemStack.is(Items.POTION)) {
+                if (!itemStack.getOrDefault(DataComponents.RARITY,Rarity.COMMON).equals(Rarity.COMMON)) {
+                    return false;
+                }
                 potions++;
             } else if (itemStack.is(ModItems.DrinkMixer)) {
                 if (!mixer && itemStack.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY) == PotionContents.EMPTY) {
