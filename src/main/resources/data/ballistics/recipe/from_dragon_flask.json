@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "ballistics:dragon_flask"
+  ],
+  "result": {
+    "id": "minecraft:dragon_breath"
+  }
+}
