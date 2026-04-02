@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "X": "#minecraft:wooden_tool_materials",
+    "Y": "ballistics:flintlock_hammer",
+    "Z": "ballistics:flintlock_barrel",
+    "#": "minecraft:stick"
+  },
+  "pattern": [
+    "YZ",
+    "#X"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ballistics:flintlock"
+  }
+}

@@ -1,6 +1,7 @@
 package llevc.ballistics;
 
 import llevc.ballistics.items.FlintlockItem;
+import llevc.ballistics.items.PerfectParryItem;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Holder;
@@ -11,13 +12,19 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -35,7 +42,10 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(BallisticsItemGroupKey).register(itemGroup -> {
             itemGroup.accept(rhGlove);
+            itemGroup.accept(Ball);
             itemGroup.accept(Flintlock);
+            itemGroup.accept(flintlockHammer);
+            itemGroup.accept(flintlockBarrel);
             itemGroup.accept(DrinkMixer);
             itemGroup.accept(EmptyFlask);
             itemGroup.accept(DragonsFlask);
@@ -92,7 +102,23 @@ public class ModItems {
             FlintlockItem::new,
             new Item.Properties().durability(24).enchantable(1).repairable(ItemTags.REPAIRS_IRON_ARMOR)
     );
+    public static final Item Ball = register(
+            "ball",
+            Item::new,
+            new Item.Properties()
+    );
+    public static final Item flintlockBarrel = register(
+            "flintlock_barrel",
+            Item::new,
+            new Item.Properties()
+    );
+    public static final Item flintlockHammer = register(
+            "flintlock_hammer",
+            Item::new,
+            new Item.Properties()
+    );
 
+    //potions
     public static final Potion MixedPotion = Registry.register(
             BuiltInRegistries.POTION,
             ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),

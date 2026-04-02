@@ -1,5 +1,8 @@
 package llevc.ballistics.items;
 
+import llevc.ballistics.FlintlockProjectile;
+import llevc.ballistics.ModItems;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +14,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -48,7 +52,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
             setCharged(itemStack, false);
 
             if (level instanceof ServerLevel serverLevel) {
-                this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(Items.ARROW)), 10.0F, 1.0F, true, null);
+                this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 10.0F, 1.0F, true, null);
             }
 
             return InteractionResult.SUCCESS;
@@ -101,5 +105,11 @@ public class FlintlockItem extends ProjectileWeaponItem {
         }
         heyo.putBoolean("charged", bool);
         itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(heyo));
+    }
+
+    @Override
+    protected Projectile createProjectile(Level level, LivingEntity livingEntity, ItemStack itemStack, ItemStack itemStack2, boolean bl) {
+        FlintlockProjectile flintlockProjectile = new FlintlockProjectile(level,livingEntity, Vec3.ZERO);
+        return flintlockProjectile;
     }
 }

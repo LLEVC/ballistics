@@ -6,6 +6,10 @@
   "itemGroup.ballistics_flasks": "Ballistics Flasks",
   "item.ballistics.prick": "Prick",
   "item.ballistics.drink_mixer": "Drink Mixer",
+  "item.ballistics.flintlock_barrel": "Flintlock Barrel",
+  "item.ballistics.flintlock_hammer": "Flintlock Hammer",
+  "item.ballistics.flintlock": "Flintlock",
+  "item.ballistics.ball": "Ball",
 
   "item.minecraft.potion.effect.mixed": "Mixed Potion",
   "item.minecraft.splash_potion.effect.mixed": "Mixed Splash Potion",

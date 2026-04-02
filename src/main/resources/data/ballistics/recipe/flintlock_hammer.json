@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:gold_ingot",
+    "minecraft:flint_and_steel",
+    "minecraft:gold_ingot"
+  ],
+  "result": {
+    "id": "ballistics:flintlock_hammer"
+  }
+}
