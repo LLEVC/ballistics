@@ -49,6 +49,11 @@ public class FlintlockProjectile extends SmallFireball {
     }
 
     @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
     public ItemStack getItem() {
         return ModItems.Ball.getDefaultInstance();
     }

@@ -110,6 +110,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
     @Override
     protected Projectile createProjectile(Level level, LivingEntity livingEntity, ItemStack itemStack, ItemStack itemStack2, boolean bl) {
         FlintlockProjectile flintlockProjectile = new FlintlockProjectile(level,livingEntity, Vec3.ZERO);
+        flintlockProjectile.setPos(livingEntity.getEyePosition());
         return flintlockProjectile;
     }
 }
