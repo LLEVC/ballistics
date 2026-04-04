@@ -1,5 +1,6 @@
 package llevc.ballistics;
 
+import llevc.ballistics.effects.Explode;
 import llevc.ballistics.items.FlintlockItem;
 import llevc.ballistics.items.PerfectParryItem;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -15,13 +16,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.BlocksAttacks;
+import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
+import net.minecraft.world.item.consume_effects.ConsumeEffect;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 
 import java.util.List;
@@ -123,6 +133,22 @@ public class ModItems {
             BuiltInRegistries.POTION,
             ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),
             new Potion("mixed")
+    );
+    public static final Holder<MobEffect> ExplodePotionEffect =
+            Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"), new Explode(MobEffectCategory.HARMFUL, CommonColors.SOFT_RED));
+    public static final Potion ExplosionPotion = Registry.register(
+            BuiltInRegistries.POTION,
+            ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"),
+            new Potion("explode",new MobEffectInstance(ExplodePotionEffect))
+    );
+
+    //the baked shi
+    public static final Item snortable = register(
+            "snortable",
+            Item::new,
+            new Item.Properties().stacksTo(16)
+                    .component(DataComponents.CONSUMABLE, Consumables.defaultFood().consumeSeconds(0.8f).animation(ItemUseAnimation.SPYGLASS).build())
+                    .component(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT.withHidden(DataComponents.DYED_COLOR,true))
     );
 
     public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
