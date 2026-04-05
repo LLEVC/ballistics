@@ -1,9 +1,6 @@
 package llevc.ballistics;
 
-import llevc.ballistics.recipes.DrinkMixerRecipeSerializer;
-import llevc.ballistics.recipes.FlaskRecipeSerializer;
-import llevc.ballistics.recipes.MixedDrinkRecipeSerializer;
-import llevc.ballistics.recipes.SnortableRecipeSerializer;
+import llevc.ballistics.recipes.*;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.core.Registry;
@@ -31,6 +28,9 @@ public class Ballistics implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, DrinkMixerRecipeSerializer.ID, DrinkMixerRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, MixedDrinkRecipeSerializer.ID, MixedDrinkRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, SnortableRecipeSerializer.ID, SnortableRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, PickRecipeSerializer.ID, PickRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, CartridgeRecipeSerializer.ID, CartridgeRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, GeekedRecipeSerializer.ID, GeekedRecipeSerializer.INSTANCE);
 
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}

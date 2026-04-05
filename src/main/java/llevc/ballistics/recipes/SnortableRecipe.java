@@ -93,41 +93,7 @@ public class SnortableRecipe extends CustomRecipe {
         }
 
         if (!overflow && flask && block != Blocks.AIR) {
-            ItemStack yes = new ItemStack(ModItems.snortable);
-            List<MobEffectInstance> effectInstanceList = new ArrayList<>();
-
-            if (block.getFriction() > 0.75) { // slippppery
-                effectInstanceList.add(new MobEffectInstance(MobEffects.SPEED, (int) Math.ceil(400/block.getFriction())));
-            }
-            if (block.getSpeedFactor() < 1) { // is it sticky?
-                effectInstanceList.add(new MobEffectInstance(MobEffects.SLOWNESS, (int) Math.ceil(200/block.getSpeedFactor())));
-            }
-            if (block.getJumpFactor() < 1) { // sticky 2, only honey has this one
-                effectInstanceList.add(new MobEffectInstance(MobEffects.SLOW_FALLING,(int) Math.ceil(200/block.getJumpFactor())));
-            } else if (block.getJumpFactor() > 1) { // bouncy but not bouncy
-                effectInstanceList.add(new MobEffectInstance(MobEffects.JUMP_BOOST,(int) Math.ceil(200*block.getJumpFactor())));
-            }
-            if (block instanceof InfestedBlock) { // is infested?
-                effectInstanceList.add(new MobEffectInstance(MobEffects.INFESTED,60*20));
-            } else if (block instanceof SlimeBlock) { // slimme
-                effectInstanceList.add(new MobEffectInstance(MobEffects.OOZING,600));
-            } else if (block instanceof TntBlock) {
-                effectInstanceList.add(new MobEffectInstance(ModItems.ExplodePotionEffect));
-            } else if (block instanceof WebBlock) { // cobweb
-                effectInstanceList.add(new MobEffectInstance(MobEffects.WEAVING,1200));
-            }
-            if (block.defaultDestroyTime() > 20 || block.defaultDestroyTime() < 0) { // long/impossible to break
-                effectInstanceList.add(new MobEffectInstance(MobEffects.MINING_FATIGUE, 1000));
-                effectInstanceList.add(new MobEffectInstance(MobEffects.RESISTANCE,1000));
-            } else if (block.defaultDestroyTime() < 0.5 && block.defaultDestroyTime() >= 0) { // instant break
-                effectInstanceList.add(new MobEffectInstance(MobEffects.HASTE, (int) Math.ceil(200/(0.5+block.defaultDestroyTime()))));
-            }
-
-            PotionContents huh = new PotionContents(Optional.of(BuiltInRegistries.POTION.wrapAsHolder(ModItems.MixedPotion)),Optional.empty(),effectInstanceList,Optional.empty());
-            yes.set(DataComponents.POTION_CONTENTS,huh);
-            yes.set(DataComponents.DYED_COLOR, new DyedItemColor(block.defaultMapColor().col));
-            yes.set(DataComponents.ITEM_NAME, Component.translatable("item.ballistics.snortable").append(block.getName()));
-            yes.set(DataComponents.CONSUMABLE, Consumables.defaultFood().consumeSeconds(Math.abs(block.defaultDestroyTime()/3)).animation(ItemUseAnimation.SPYGLASS).build());
+            ItemStack yes = ModItems.createSnortable(block);
             result = yes;
         }
 
