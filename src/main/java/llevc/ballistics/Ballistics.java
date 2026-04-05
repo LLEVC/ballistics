@@ -31,6 +31,7 @@ public class Ballistics implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, PickRecipeSerializer.ID, PickRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, CartridgeRecipeSerializer.ID, CartridgeRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, GeekedRecipeSerializer.ID, GeekedRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlintlockLoadRecipeSerializer.ID, FlintlockLoadRecipeSerializer.INSTANCE);
 
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}
