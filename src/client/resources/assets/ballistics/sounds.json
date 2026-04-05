@@ -1,0 +1,14 @@
+{
+  "flintlock_shoot": {
+    "subtitle": "sound.ballistics.flintlock_shot",
+    "sounds": []
+  },
+  "flintlock_click": {
+    "subtitle": "sound.ballistics.flintlock_click",
+    "sounds": []
+  },
+  "flintlock_dry_shoot": {
+    "subtitle": "sound.ballistics.flintlock_dry_shot",
+    "sounds": []
+  }
+}

@@ -1,5 +1,6 @@
 {
   "type": "minecraft:stonecutting",
+  "category": "equipment",
   "ingredient": "minecraft:iron_ingot",
   "result": {
     "id": "ballistics:ball",

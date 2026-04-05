@@ -2,16 +2,20 @@ package llevc.ballistics.items;
 
 import llevc.ballistics.FlintlockProjectile;
 import llevc.ballistics.ModItems;
+import llevc.ballistics.ModSounds;
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -51,11 +55,17 @@ public class FlintlockItem extends ProjectileWeaponItem {
         if (isCharged(itemStack)) {
             setCharged(itemStack, false);
 
-            if (level instanceof ServerLevel serverLevel) {
-                this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 10.0F, 1.0F, true, null);
+            if (isLoaded(itemStack)) {
+                setLoaded(itemStack,false);
+                if (level instanceof ServerLevel serverLevel) {
+                    this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 10.0F, 1.0F, true, null);
+                }
+                //level.playSound(player,player.getX(),player.getY(),player.getZ(), ModSounds.FlintlockShoot, getSoundSource(player));
+                return InteractionResult.SUCCESS;
+            } else {
+                //level.playSound(player,player.getX(),player.getY(),player.getZ(), ModSounds.FlintlockDryShoot, getSoundSource(player));
+                return InteractionResult.PASS;
             }
-
-            return InteractionResult.SUCCESS;
         } else {
             player.startUsingItem(interactionHand);
             return InteractionResult.PASS;
@@ -68,6 +78,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
         int hey = getUseDuration(itemStack,livingEntity) - i;
         if (hey > 20 && !isCharged(itemStack)) {
             setCharged(itemStack,true);
+            //level.playSound(livingEntity,livingEntity.getX(),livingEntity.getY(),livingEntity.getZ(), ModSounds.FlintlockClick, getSoundSource(livingEntity));
         }
     }
 
@@ -103,8 +114,31 @@ public class FlintlockItem extends ProjectileWeaponItem {
                 heyo = yo.copyTag();
             }
         }
+        heyo.remove("charged");
         heyo.putBoolean("charged", bool);
         itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(heyo));
+    }
+
+    public boolean isLoaded(ItemStack itemStack) {
+        ChargedProjectiles yo = itemStack.getOrDefault(DataComponents.CHARGED_PROJECTILES,ChargedProjectiles.EMPTY);
+        return !yo.isEmpty();
+    }
+
+    public void setLoaded(ItemStack itemStack, boolean bool) {
+        ChargedProjectiles yo = itemStack.getOrDefault(DataComponents.CHARGED_PROJECTILES,ChargedProjectiles.EMPTY);
+        if (bool) {
+            itemStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new ItemStack(ModItems.Ball)));
+        } else {
+            itemStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY);
+        }
+    }
+
+    public SoundSource getSoundSource(LivingEntity livingEntity) {
+        SoundSource soundSource = SoundSource.HOSTILE;
+        if (livingEntity instanceof Player) {
+            soundSource = SoundSource.PLAYERS;
+        }
+        return soundSource;
     }
 
     @Override

@@ -2,6 +2,7 @@ package llevc.ballistics;
 
 import llevc.ballistics.recipes.DrinkMixerRecipeSerializer;
 import llevc.ballistics.recipes.FlaskRecipeSerializer;
+import llevc.ballistics.recipes.FlintlockLoadRecipeSerializer;
 import llevc.ballistics.recipes.MixedDrinkRecipeSerializer;
 import net.fabricmc.api.ModInitializer;
 
@@ -29,6 +30,7 @@ public class Ballistics implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlaskRecipeSerializer.ID, FlaskRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, DrinkMixerRecipeSerializer.ID, DrinkMixerRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, MixedDrinkRecipeSerializer.ID, MixedDrinkRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlintlockLoadRecipeSerializer.ID, FlintlockLoadRecipeSerializer.INSTANCE);
 
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}

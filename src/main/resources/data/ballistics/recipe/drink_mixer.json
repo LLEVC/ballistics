@@ -2,14 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "aba",
-    " a "
+    "a",
+    "b",
+    "a"
   ],
   "key": {
     "a": "minecraft:iron_ingot",
-    "b": "minecraft:glass_bottle"
+    "b": "minecraft:bucket"
   },
   "result": {
-    "id": "ballistics:empty_flask"
+    "id": "ballistics:drink_mixer"
   }
 }
