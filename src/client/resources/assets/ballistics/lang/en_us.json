@@ -4,6 +4,7 @@
   "item.ballistics.rh_glove": "Rocket Handling Glove",
   "itemGroup.ballistics": "Ballistics",
   "itemGroup.ballistics_flasks": "Ballistics Flasks",
+  "itemGroup.ballistics_geeked": "Ballistics Baked",
   "item.ballistics.prick": "Prick",
   "item.ballistics.drink_mixer": "Drink Mixer",
   "item.ballistics.flintlock_barrel": "Flintlock Barrel",
@@ -51,5 +52,10 @@
   "item.ballistics.flask.effect.weaving": "Flask of Weaving",
   "item.ballistics.flask.effect.wind_charged": "Flask of Wind Charging",
 
-  "item.ballistics.snortable": "Snortable "
+  "item.ballistics.snortable": "Snortable ",
+  "item.ballistics.custom_cig": "Custom Cig",
+  "item.ballistics.cig": "Cig",
+  "item.ballistics.vape": "Vape",
+  "item.ballistics.pick": "Pick",
+  "item.ballistics.cartridge": "Cartridge"
 }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "dbe",
+    "bab",
+    "cbd"
+  ],
+  "key": {
+    "a": "minecraft:slime_ball",
+    "b": "minecraft:paper",
+    "c": "minecraft:honey_bottle",
+    "d": "minecraft:iron_nugget",
+    "e": "minecraft:string"
+  },
+  "result": {
+    "id": "ballistics:cig",
+    "count": 1
+  }
+}
