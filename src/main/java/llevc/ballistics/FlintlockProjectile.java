@@ -1,5 +1,6 @@
 package llevc.ballistics;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -43,8 +45,16 @@ public class FlintlockProjectile extends SmallFireball {
             Entity entity = entityHitResult.getEntity();
             Entity entity1 = this.getOwner();
 
-            DamageSource damageSource = this.damageSources().source(DamageTypes.ARROW,entity,entity1);
+            DamageSource damageSource = this.damageSources().mobProjectile(this,entity1.asLivingEntity());
             entity.hurtServer(serverLevel,damageSource,16);
+            if (entity instanceof LivingEntity livingEntity) {
+                if (livingEntity.isBlocking()) {
+                    BlocksAttacks blocksAttacks = livingEntity.getItemBlockingWith().get(DataComponents.BLOCKS_ATTACKS);
+                    if (blocksAttacks != null) {
+                        blocksAttacks.disable(serverLevel,livingEntity,5.0f,livingEntity.getItemBlockingWith());
+                    }
+                }
+            }
         }
     }
 

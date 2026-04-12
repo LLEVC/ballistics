@@ -1,14 +1,22 @@
 {
   "flintlock_shoot": {
     "subtitle": "sound.ballistics.flintlock_shot",
-    "sounds": []
+    "sounds": [{"name": "ballistics:flintlockfire"}]
   },
   "flintlock_click": {
     "subtitle": "sound.ballistics.flintlock_click",
-    "sounds": []
+    "sounds": [{"name": "ballistics:flintlockload"}]
   },
   "flintlock_dry_shoot": {
     "subtitle": "sound.ballistics.flintlock_dry_shot",
-    "sounds": []
+    "sounds": [{"name": "ballistics:flintlockdryfire"}]
+  },
+  "flintlock_hit": {
+    "subtitle": "sound.ballistics.flintlock_hit",
+    "sounds": [{"name": "ballistics:flintlockballhit"}]
+  },
+  "flintlock_miss": {
+    "subtitle": "sound.ballistics.flintlock_miss",
+    "sounds": [{"name": "ballistics:flintlockballhit"}]
   }
 }

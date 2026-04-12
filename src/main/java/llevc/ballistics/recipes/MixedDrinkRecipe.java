@@ -77,7 +77,7 @@ public class MixedDrinkRecipe extends CustomRecipe {
         ItemStack wowwie = new ItemStack(ModItems.Flask);
         wowwie.set(DataComponents.POTION_CONTENTS,huh);
         wowwie.setCount(flasks);
-        if (level > 2*(2+bbl.size())) {
+        if (level > 2*(1+bbl.size())) {
             wowwie.set(DataComponents.RARITY, Rarity.RARE);
         }
         result = wowwie;

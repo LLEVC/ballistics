@@ -12,6 +12,19 @@
   "item.ballistics.flintlock": "Flintlock",
   "item.ballistics.ball": "Ball",
 
+  "enchantment.ballistics.gripping": "Gripping",
+  "enchantment.ballistics.handling": "Handling",
+  "enchantment.ballistics.graceful": "Graceful",
+  "enchantment.ballistics.bluntness": "Bluntness",
+  "enchantment.ballistics.deadeye": "Deadeye",
+  "enchantment.ballistics.quickload": "Quick Load",
+
+  "sound.ballistics.flintlock_shot": "Flintlock fired",
+  "sound.ballistics.flintlock_dry_shot": "Flintlock dry fired",
+  "sound.ballistics.flintlock_click": "Flintlock click",
+  "sound.ballistics.flintlock_hit": "Flintlock ball hit",
+  "sound.ballistics.flintlock_hit": "Flintlock ball missed",
+
   "item.minecraft.potion.effect.mixed": "Mixed Potion",
   "item.minecraft.splash_potion.effect.mixed": "Mixed Splash Potion",
   "item.minecraft.lingering_potion.effect.mixed": "Mixed Lingering Potion",

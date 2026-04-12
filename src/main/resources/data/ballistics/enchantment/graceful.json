@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.ballistics.graceful"
+  },
+  "max_cost": {
+    "base": 24,
+    "per_level_above_first": 12
+  },
+  "max_level": 1,
+  "min_cost": {
+    "base": 2,
+    "per_level_above_first": 4
+  },
+  "primary_items": "#ballistics:enchantable/glove",
+  "slots": [
+    "hand"
+  ],
+  "supported_items": "#ballistics:enchantable/glove",
+  "weight": 10,
+  "effects": {}
+}

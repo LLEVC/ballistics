@@ -1,6 +1,7 @@
 package llevc.ballistics;
 
 import llevc.ballistics.effects.Explode;
+import llevc.ballistics.items.FireworkLauncherItem;
 import llevc.ballistics.items.FlintlockItem;
 import llevc.ballistics.items.PerfectParryItem;
 import llevc.ballistics.items.SmokeItem;
@@ -25,6 +26,9 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -35,7 +39,9 @@ import net.minecraft.world.item.consume_effects.ConsumeEffect;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
+import org.w3c.dom.Attr;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,19 +62,20 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(BallisticsItemGroupKey).register(itemGroup -> {
             itemGroup.accept(rhGlove);
-            itemGroup.accept(Ball);
+            itemGroup.accept(FireworkLauncher);
             itemGroup.accept(Flintlock);
+            itemGroup.accept(Ball);
             itemGroup.accept(flintlockHammer);
             itemGroup.accept(flintlockBarrel);
             itemGroup.accept(DrinkMixer);
             itemGroup.accept(EmptyFlask);
             itemGroup.accept(DragonsFlask);
             itemGroup.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
-            itemGroup.accept(snortable);
             itemGroup.accept(pick);
             itemGroup.accept(cig);
             itemGroup.accept(vape);
             itemGroup.accept(cartridge);
+            itemGroup.accept(snortable);
         });
         ItemGroupEvents.modifyEntriesEvent(BallisticsFlaskItemGroupKey).register(itemGroup -> {
             itemGroup.accept(DrinkMixer);
@@ -173,7 +180,15 @@ public class ModItems {
     public static final Item Flintlock = register(
             "flintlock",
             FlintlockItem::new,
-            new Item.Properties().durability(24).enchantable(1).repairable(ItemTags.REPAIRS_IRON_ARMOR)
+            new Item.Properties()
+                    .durability(24)
+                    .enchantable(1)
+                    .repairable(ItemTags.REPAIRS_IRON_ARMOR)
+                    .component(DataComponents.WEAPON,new Weapon(1,1))
+                    .attributes(ItemAttributeModifiers.builder()
+                            .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID,1.0f, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                            .add(Attributes.ATTACK_SPEED, new AttributeModifier(Item.BASE_ATTACK_SPEED_ID,-2.0f, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                            .build())
     );
     public static final Item Ball = register(
             "ball",
@@ -189,6 +204,11 @@ public class ModItems {
             "flintlock_hammer",
             Item::new,
             new Item.Properties()
+    );
+    public static final Item FireworkLauncher = register(
+            "firework_launcher",
+            FireworkLauncherItem::new,
+            new Item.Properties().stacksTo(1).durability(465).component(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY).enchantable(1).component(DataComponents.LORE,new ItemLore(List.of(Component.literal("literally just a crossbow which only accepts fireworks lmao"))))
     );
 
     //potions

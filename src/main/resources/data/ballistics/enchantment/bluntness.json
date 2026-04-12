@@ -1,0 +1,35 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.ballistics.bluntness"
+  },
+  "max_cost": {
+    "base": 36,
+    "per_level_above_first": 4
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 4,
+    "per_level_above_first": 2
+  },
+  "primary_items": "#ballistics:enchantable/flintlock",
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#ballistics:enchantable/flintlock",
+  "weight": 10,
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "attribute": "minecraft:attack_damage",
+        "id": "ballistics:bluntness",
+        "amount": {
+          "type": "minecraft:linear",
+          "base": 2,
+          "per_level_above_first": 1
+        },
+        "operation": "add_value"
+      }
+    ]
+  }
+}

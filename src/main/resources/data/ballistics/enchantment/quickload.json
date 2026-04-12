@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.ballistics.quickload"
+  },
+  "max_cost": {
+    "base": 36,
+    "per_level_above_first": 4
+  },
+  "max_level": 1,
+  "min_cost": {
+    "base": 4,
+    "per_level_above_first": 2
+  },
+  "primary_items": "#ballistics:enchantable/flintlock",
+  "slots": [
+    "hand"
+  ],
+  "supported_items": "#ballistics:enchantable/flintlock",
+  "weight": 10,
+  "effects": {}
+}

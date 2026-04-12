@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.ballistics.handling"
+  },
+  "max_cost": {
+    "base": 36,
+    "per_level_above_first": 6
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 2
+  },
+  "primary_items": "#ballistics:enchantable/glove",
+  "slots": [
+    "hand"
+  ],
+  "supported_items": "#ballistics:enchantable/glove",
+  "weight": 10,
+  "effects": {}
+}
