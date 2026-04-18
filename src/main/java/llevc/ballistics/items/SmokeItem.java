@@ -7,11 +7,15 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -70,10 +74,13 @@ public class SmokeItem extends Item {
                 livingEntity.stopUsingItem();
                 if (livingEntity instanceof Player player) {
                     player.getCooldowns().addCooldown(itemStack,getUseDuration(itemStack, livingEntity)*2);
+                    if (smokeParticles() && !player.level().isClientSide()) {
+                        livingEntity.hurtServer((ServerLevel) player.level(), livingEntity.damageSources().source(ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath("ballistics","lungs"))),2.0f);
+                    }
                 }
             }
         }
-    }
+    } 
 
     public void spawnSmokeParticles(Level level, LivingEntity livingEntity) {
         if (smokeParticles()) {
@@ -146,9 +153,11 @@ public class SmokeItem extends Item {
                             itemStack.hurtAndBreak(1, livingEntity, equipmentSlot);
                         }
                         if (woah <= 1) {
-                            livingEntity.stopUsingItem();
                             if (livingEntity instanceof Player player) {
                                 player.getCooldowns().addCooldown(itemStack, getUseDuration(itemStack, livingEntity) * 2);
+                                if (smokeParticles()) {
+                                    livingEntity.hurtServer(serverLevel, livingEntity.damageSources().source(ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath("ballistics","lungs"))),2.0f);
+                                }
                             }
                         }
                     }

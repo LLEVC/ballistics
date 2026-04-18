@@ -25,6 +25,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -165,7 +166,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
     }
 
     @Override
-    protected Projectile createProjectile(Level level, LivingEntity livingEntity, ItemStack itemStack, ItemStack itemStack2, boolean bl) {
+    protected @NotNull Projectile createProjectile(Level level, LivingEntity livingEntity, ItemStack itemStack, ItemStack itemStack2, boolean bl) {
         FlintlockProjectile flintlockProjectile = new FlintlockProjectile(level,livingEntity, Vec3.ZERO);
         flintlockProjectile.setPos(livingEntity.getEyePosition());
         return flintlockProjectile;

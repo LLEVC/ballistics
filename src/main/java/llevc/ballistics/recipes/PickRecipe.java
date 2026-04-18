@@ -30,7 +30,7 @@ public class PickRecipe extends CustomRecipe {
         for (int i = 0; i < recipeInput.size(); i++) {
             ItemStack itemStack = recipeInput.getItem(i);
             if (itemStack.is(Items.POTION)) {
-                if (!potion) {
+                if (!potion && itemStack.getRarity() == Rarity.COMMON) {
                     potion = true;
                 } else {
                     return false;

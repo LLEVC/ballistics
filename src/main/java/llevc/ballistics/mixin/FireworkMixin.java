@@ -82,7 +82,7 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 	@Unique
 	public void fireworkHit(ServerLevel serverLevel, Operation<Void> original) {
 		if (!this.getExplosions().isEmpty()) {
-			if (this.isShotAtAngle()) {
+			if (this.isShotAtAngle() && !this.isAttachedToEntity()) {
 				jump(serverLevel, this.getOwner());
 			}
 			List<LivingEntity> wsg = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0));

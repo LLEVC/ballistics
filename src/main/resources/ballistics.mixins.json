@@ -8,7 +8,6 @@
     "FireworkMixin",
     "ItemDropMomentumMixin",
     "ItemEntityMixin",
-    "PerfectParryMixin",
     "PlayerMixin",
     "PotionBrewingMixin",
     "PotionMixin"
