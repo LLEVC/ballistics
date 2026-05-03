@@ -69,15 +69,15 @@ public class FlintlockItem extends ProjectileWeaponItem {
                 if (level instanceof ServerLevel serverLevel) {
                     this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 10.0F, 1.0F, true, null);
                 }
-                level.playSound(player,player.blockPosition(),ModSounds.FlintlockShoot,SoundSource.PLAYERS,0.5f,1.0f);
+                level.playSound(null,player.blockPosition(),ModSounds.FlintlockShoot,player.getSoundSource(),0.5f,1.0f);
                 return InteractionResult.SUCCESS;
             } else {
-                level.playSound(player,player.blockPosition(),ModSounds.FlintlockDryShoot,SoundSource.PLAYERS,0.5f,1.0f);
+                level.playSound(null,player.blockPosition(),ModSounds.FlintlockDryShoot,player.getSoundSource(),0.5f,1.0f);
                 return InteractionResult.PASS;
             }
         } else {
             player.startUsingItem(interactionHand);
-            level.playSound(player,player.blockPosition(),ModSounds.FlintlockClick,SoundSource.PLAYERS,0.5f,1.0f);
+            level.playSound(null,player.blockPosition(),ModSounds.FlintlockClick,player.getSoundSource(),0.5f,1.0f);
             return InteractionResult.PASS;
         }
     }

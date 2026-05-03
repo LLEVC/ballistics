@@ -2,6 +2,7 @@ package llevc.ballistics;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -35,6 +36,7 @@ public class FlintlockProjectile extends SmallFireball {
     protected void onHitBlock(BlockHitResult blockHitResult) {
         if (!level().isClientSide()) {
             level().broadcastEntityEvent(this,(byte) 3);
+            level().playSound(null,blockHitResult.getBlockPos(),ModSounds.FlintlockMiss, SoundSource.PLAYERS,0.5f,1.0f);
             this.kill((ServerLevel) level());
         }
     }
@@ -46,6 +48,7 @@ public class FlintlockProjectile extends SmallFireball {
             Entity entity1 = this.getOwner();
 
             DamageSource damageSource = this.damageSources().mobProjectile(this,entity1.asLivingEntity());
+            serverLevel.playSound(null,entityHitResult.getEntity().blockPosition(),ModSounds.FlintlockHit, SoundSource.PLAYERS,0.5f,1.0f);
             entity.hurtServer(serverLevel,damageSource,16);
             if (entity instanceof LivingEntity livingEntity) {
                 if (livingEntity.isBlocking()) {

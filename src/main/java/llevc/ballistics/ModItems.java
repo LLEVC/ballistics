@@ -80,7 +80,7 @@ public class ModItems {
                 Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
                 if (wchat.isPresent()) {
                     Potion hey = wchat.get().value();
-                    itemGroup.accept(PotionContents.createItemStack(ModItems.Flask,Holder.direct(hey)));
+                    itemGroup.accept(PotionContents.createItemStack(Flask,Holder.direct(hey)));
                 }
             }
         });

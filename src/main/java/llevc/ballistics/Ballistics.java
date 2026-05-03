@@ -24,6 +24,7 @@ public class Ballistics implements ModInitializer {
 
 		ModItems.initialize();
 		ModSounds.initialize();
+		ModDamageTypes.initialize();
 
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlaskRecipeSerializer.ID, FlaskRecipeSerializer.INSTANCE);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, DrinkMixerRecipeSerializer.ID, DrinkMixerRecipeSerializer.INSTANCE);
