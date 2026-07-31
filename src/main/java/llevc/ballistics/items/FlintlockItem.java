@@ -50,7 +50,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
 
     @Override //bow code as placeholder
     protected void shootProjectile(LivingEntity livingEntity, Projectile projectile, int i, float f, float g, float h, @Nullable LivingEntity livingEntity2) {
-        projectile.shootFromRotation(livingEntity, livingEntity.getXRot(), livingEntity.getYRot() + h, 0.0F, f, g);
+        projectile.shootFromRotation(livingEntity, livingEntity.getXRot(), livingEntity.getYRot(), 0.0F, f, g);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
             if (isLoaded(itemStack)) {
                 setLoaded(itemStack,false);
                 if (level instanceof ServerLevel serverLevel) {
-                    this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 10.0F, 1.0F, true, null);
+                    this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 5.0f, 1.0F, true, null);
                 }
                 level.playSound(null,player.blockPosition(),ModSounds.FlintlockShoot,player.getSoundSource(),0.5f,1.0f);
                 return InteractionResult.SUCCESS;
