@@ -4,13 +4,13 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
 
 public class FlaskRecipeSerializer implements RecipeSerializer<FlaskRecipe> {
     public static final FlaskRecipeSerializer INSTANCE = new FlaskRecipeSerializer(FlaskRecipe::new);
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("ballistics","crafting_special_flask");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("ballistics","crafting_special_flask");
 
 
 

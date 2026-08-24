@@ -7,7 +7,7 @@ import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -94,7 +94,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
             Iterator<Holder<Enchantment>> wow = itemEnchantments.keySet().iterator();
             while (wow.hasNext()) {
                 Holder<Enchantment> heyo = wow.next();
-                if (heyo.is(ResourceLocation.fromNamespaceAndPath("ballistics","quickload"))) {
+                if (heyo.is(Identifier.fromNamespaceAndPath("ballistics","quickload"))) {
                     sonofa = true;
                 }
             }

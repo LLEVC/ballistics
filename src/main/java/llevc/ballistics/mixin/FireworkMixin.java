@@ -15,7 +15,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -126,10 +126,10 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 		Iterator<Holder<Enchantment>> wow = itemEnchantments.keySet().iterator();
 		while (wow.hasNext()) {
 			Holder<Enchantment> heyo = wow.next();
-			if (heyo.is(ResourceLocation.fromNamespaceAndPath("ballistics","gripping"))) {
+			if (heyo.is(Identifier.fromNamespaceAndPath("ballistics","gripping"))) {
 				maxthemticks = themticks + (2 * EnchantmentHelper.getEnchantmentLevel(heyo,this.attachedToEntity));
 				themticks = maxthemticks;
-			} else if (heyo.is(ResourceLocation.fromNamespaceAndPath("ballistics","handling"))) {
+			} else if (heyo.is(Identifier.fromNamespaceAndPath("ballistics","handling"))) {
 				fallDamageWindow = (5 * EnchantmentHelper.getEnchantmentLevel(heyo,this.attachedToEntity));
 			}
 		}
@@ -141,7 +141,7 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 		Iterator<Holder<Enchantment>> wow = itemEnchantments.keySet().iterator();
 		while (wow.hasNext()) {
 			Holder<Enchantment> heyo = wow.next();
-			if (heyo.is(ResourceLocation.fromNamespaceAndPath("ballistics","graceful"))) {
+			if (heyo.is(Identifier.fromNamespaceAndPath("ballistics","graceful"))) {
 				letitgo = true;
 			}
 		}

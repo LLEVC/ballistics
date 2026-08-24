@@ -18,7 +18,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.effect.MobEffect;
@@ -44,7 +44,7 @@ import java.util.function.Function;
 
 public class ModItems {
     public static <GenericItem extends Item> GenericItem register(String name, Function<Item.Properties, GenericItem> itemFactory, Item.Properties settings) {
-        ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, name));
+        ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, name));
         GenericItem item = itemFactory.apply(settings.setId(itemKey));
         Registry.register(BuiltInRegistries.ITEM, itemKey, item);
         return item;
@@ -209,14 +209,14 @@ public class ModItems {
     //potions
     public static final Potion MixedPotion = Registry.register(
             BuiltInRegistries.POTION,
-            ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),
+            Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),
             new Potion("mixed")
     );
     public static final Holder<MobEffect> ExplodePotionEffect =
-            Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"), new Explode(MobEffectCategory.HARMFUL, CommonColors.SOFT_RED));
+            Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"), new Explode(MobEffectCategory.HARMFUL, CommonColors.SOFT_RED));
     public static final Potion ExplosionPotion = Registry.register(
             BuiltInRegistries.POTION,
-            ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"),
+            Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"),
             new Potion("explode",new MobEffectInstance(ExplodePotionEffect))
     );
 
@@ -293,10 +293,10 @@ public class ModItems {
         return yes;
     }
 
-    public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
+    public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
     public static final CreativeModeTab BallisticsItemGroup = FabricItemGroup.builder().icon(() -> new ItemStack(Items.FIREWORK_ROCKET)).title(Component.translatable("itemGroup.ballistics")).build();
-    public static final ResourceKey<CreativeModeTab> BallisticsFlaskItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_flasks"));
+    public static final ResourceKey<CreativeModeTab> BallisticsFlaskItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_flasks"));
     public static final CreativeModeTab BallisticsFlaskItemGroup = FabricItemGroup.builder().icon(() -> new ItemStack(EmptyFlask)).title(Component.translatable("itemGroup.ballistics_flasks")).build();
-    public static final ResourceKey<CreativeModeTab> BallisticsBakedItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_geeked"));
+    public static final ResourceKey<CreativeModeTab> BallisticsBakedItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_geeked"));
     public static final CreativeModeTab BallisticsBakedItemGroup = FabricItemGroup.builder().icon(() -> new ItemStack(vape)).title(Component.translatable("itemGroup.ballistics_geeked")).build();
 }

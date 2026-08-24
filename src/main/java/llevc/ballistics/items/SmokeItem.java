@@ -9,7 +9,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
@@ -101,7 +100,7 @@ public class SmokeItem extends Item {
             sendSmokeParticles(serverLevel,livingEntity);
             Optional<Holder.Reference<DamageType>> heyo = serverLevel.registryAccess()
                     .lookupOrThrow(Registries.DAMAGE_TYPE)
-                    .get(ModDamageTypes.lungCancer.location());
+                    .get(ModDamageTypes.lungCancer.identifier());
 
             Ballistics.LOGGER.info(String.valueOf(smokeParticles(itemStack) && i < 3 && heyo.isPresent()));
             if (smokeParticles(itemStack) && i < 3 && heyo.isPresent()) {

@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.CustomRecipe;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class DrinkMixerRecipeSerializer implements RecipeSerializer<DrinkMixerRecipe> {
     public static final DrinkMixerRecipeSerializer INSTANCE = new DrinkMixerRecipeSerializer(DrinkMixerRecipe::new);
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("ballistics","crafting_special_drink_mixer");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("ballistics","crafting_special_drink_mixer");
 
 
 
