@@ -1,6 +1,5 @@
 package llevc.ballistics;
 
-import llevc.ballistics.effects.Explode;
 import llevc.ballistics.items.FireworkLauncherItem;
 import llevc.ballistics.items.FlintlockItem;
 import llevc.ballistics.items.SmokeItem;
@@ -121,13 +120,6 @@ public class ModItems {
             Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),
             new Potion("mixed")
     );
-    public static final Holder<MobEffect> ExplodePotionEffect =
-            Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"), new Explode(MobEffectCategory.HARMFUL, CommonColors.SOFT_RED));
-    public static final Potion ExplosionPotion = Registry.register(
-            BuiltInRegistries.POTION,
-            Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"),
-            new Potion("explode",new MobEffectInstance(ExplodePotionEffect))
-    );
 
     //the baked shi
     public static final Item snortable = register(
@@ -182,8 +174,6 @@ public class ModItems {
             effectInstanceList.add(new MobEffectInstance(MobEffects.INFESTED,60*20));
         } else if (block instanceof SlimeBlock) { // slimme
             effectInstanceList.add(new MobEffectInstance(MobEffects.OOZING,600));
-        } else if (block instanceof TntBlock) {
-            effectInstanceList.add(new MobEffectInstance(ModItems.ExplodePotionEffect));
         } else if (block instanceof WebBlock) { // cobweb
             effectInstanceList.add(new MobEffectInstance(MobEffects.WEAVING,1200));
         }
