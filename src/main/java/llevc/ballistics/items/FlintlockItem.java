@@ -159,7 +159,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
     public void setLoaded(ItemStack itemStack, boolean bool) {
         ChargedProjectiles yo = itemStack.getOrDefault(DataComponents.CHARGED_PROJECTILES,ChargedProjectiles.EMPTY);
         if (bool) {
-            itemStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new ItemStack(ModItems.Ball)));
+            itemStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new ItemStackTemplate(ModItems.Ball)));
         } else {
             itemStack.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY);
         }

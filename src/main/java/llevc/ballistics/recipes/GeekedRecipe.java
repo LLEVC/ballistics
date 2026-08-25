@@ -1,8 +1,11 @@
 package llevc.ballistics.recipes;
 
+import com.mojang.serialization.MapCodec;
 import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -18,8 +21,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class GeekedRecipe extends CustomRecipe {
-    public GeekedRecipe(CraftingBookCategory craftingBookCategory) {
-        super(craftingBookCategory);
+    public GeekedRecipe() {
+        super();
     }
 
     public boolean matches(CraftingInput recipeInput, Level level) {
@@ -47,7 +50,7 @@ public class GeekedRecipe extends CustomRecipe {
         return (potion && flask && recipeInput.ingredientCount() <= 2);
     }
 
-    public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput recipeInput) {
         ItemStack result = ItemStack.EMPTY;
         ItemStack potion = ItemStack.EMPTY;
         ItemStack geek = ItemStack.EMPTY;
@@ -96,8 +99,19 @@ public class GeekedRecipe extends CustomRecipe {
         return result;
     }
 
+    public static final GeekedRecipe instance = new GeekedRecipe();
+    public static final MapCodec<GeekedRecipe> MAP_CODEC;
+    public static final StreamCodec<RegistryFriendlyByteBuf, GeekedRecipe> STREAM_CODEC;
+    public static final RecipeSerializer<GeekedRecipe> SERIALIZER;
+
     @Override
-    public RecipeSerializer<GeekedRecipe> getSerializer() {
-        return GeekedRecipeSerializer.INSTANCE;
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
+        return SERIALIZER;
+    }
+
+    static {
+        MAP_CODEC = MapCodec.unit(instance);
+        STREAM_CODEC = StreamCodec.unit(instance);
+        SERIALIZER = new RecipeSerializer(MAP_CODEC, STREAM_CODEC);
     }
 }

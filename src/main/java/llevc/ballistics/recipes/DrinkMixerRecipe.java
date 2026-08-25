@@ -1,8 +1,11 @@
 package llevc.ballistics.recipes;
 
+import com.mojang.serialization.MapCodec;
 import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -18,8 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class DrinkMixerRecipe extends CustomRecipe {
-    public DrinkMixerRecipe(CraftingBookCategory craftingBookCategory) {
-        super(craftingBookCategory);
+    public DrinkMixerRecipe() {
+        super();
     }
 
     public boolean matches(CraftingInput recipeInput, Level level) {
@@ -47,7 +50,7 @@ public class DrinkMixerRecipe extends CustomRecipe {
         return (mixer && 0 < potions && potions <= 4);
     }
 
-    public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput recipeInput) {
         ItemStack result = ModItems.DrinkMixer.getDefaultInstance();
         boolean mixer = false;
         List<PotionContents> mhm = new java.util.ArrayList<>(List.of());
@@ -104,8 +107,19 @@ public class DrinkMixerRecipe extends CustomRecipe {
         return result;
     }
 
+    public static final DrinkMixerRecipe instance = new DrinkMixerRecipe();
+    public static final MapCodec<DrinkMixerRecipe> MAP_CODEC;
+    public static final StreamCodec<RegistryFriendlyByteBuf, DrinkMixerRecipe> STREAM_CODEC;
+    public static final RecipeSerializer<DrinkMixerRecipe> SERIALIZER;
+
     @Override
-    public RecipeSerializer<DrinkMixerRecipe> getSerializer() {
-        return DrinkMixerRecipeSerializer.INSTANCE;
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
+        return SERIALIZER;
+    }
+
+    static {
+        MAP_CODEC = MapCodec.unit(instance);
+        STREAM_CODEC = StreamCodec.unit(instance);
+        SERIALIZER = new RecipeSerializer(MAP_CODEC, STREAM_CODEC);
     }
 }

@@ -1,9 +1,12 @@
 package llevc.ballistics.recipes;
 
+import com.mojang.serialization.MapCodec;
 import llevc.ballistics.ModItems;
 import llevc.ballistics.items.FlintlockItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -20,8 +23,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class FlintlockLoadRecipe extends CustomRecipe {
-    public FlintlockLoadRecipe(CraftingBookCategory craftingBookCategory) {
-        super(craftingBookCategory);
+    public FlintlockLoadRecipe() {
+        super();
     }
 
     public boolean matches(CraftingInput recipeInput, Level level) {
@@ -49,7 +52,7 @@ public class FlintlockLoadRecipe extends CustomRecipe {
         return (potion && flask && recipeInput.ingredientCount() <= 2);
     }
 
-    public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput recipeInput) {
         ItemStack result = ItemStack.EMPTY;
         ItemStack potion = ItemStack.EMPTY;
         boolean flask = false;
@@ -88,8 +91,19 @@ public class FlintlockLoadRecipe extends CustomRecipe {
         return result;
     }
 
+    public static final FlintlockLoadRecipe instance = new FlintlockLoadRecipe();
+    public static final MapCodec<FlintlockLoadRecipe> MAP_CODEC;
+    public static final StreamCodec<RegistryFriendlyByteBuf, FlintlockLoadRecipe> STREAM_CODEC;
+    public static final RecipeSerializer<FlintlockLoadRecipe> SERIALIZER;
+
     @Override
-    public RecipeSerializer<FlintlockLoadRecipe> getSerializer() {
-        return FlintlockLoadRecipeSerializer.INSTANCE;
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
+        return SERIALIZER;
+    }
+
+    static {
+        MAP_CODEC = MapCodec.unit(instance);
+        STREAM_CODEC = StreamCodec.unit(instance);
+        SERIALIZER = new RecipeSerializer(MAP_CODEC, STREAM_CODEC);
     }
 }

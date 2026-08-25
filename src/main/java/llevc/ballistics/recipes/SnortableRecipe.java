@@ -1,11 +1,14 @@
 package llevc.ballistics.recipes;
 
+import com.mojang.serialization.MapCodec;
 import llevc.ballistics.Ballistics;
 import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -36,8 +39,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class SnortableRecipe extends CustomRecipe {
-    public SnortableRecipe(CraftingBookCategory craftingBookCategory) {
-        super(craftingBookCategory);
+    public SnortableRecipe() {
+        super();
     }
 
     public boolean matches(CraftingInput recipeInput, Level level) {
@@ -65,7 +68,7 @@ public class SnortableRecipe extends CustomRecipe {
         return (potion && flask && recipeInput.ingredientCount() <= 2);
     }
 
-    public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput recipeInput) {
         ItemStack result = ItemStack.EMPTY;
         Block block = Blocks.AIR;
         boolean flask = false;
@@ -100,8 +103,19 @@ public class SnortableRecipe extends CustomRecipe {
         return result;
     }
 
+    public static final SnortableRecipe instance = new SnortableRecipe();
+    public static final MapCodec<SnortableRecipe> MAP_CODEC;
+    public static final StreamCodec<RegistryFriendlyByteBuf, SnortableRecipe> STREAM_CODEC;
+    public static final RecipeSerializer<SnortableRecipe> SERIALIZER;
+
     @Override
-    public RecipeSerializer<SnortableRecipe> getSerializer() {
-        return SnortableRecipeSerializer.INSTANCE;
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
+        return SERIALIZER;
+    }
+
+    static {
+        MAP_CODEC = MapCodec.unit(instance);
+        STREAM_CODEC = StreamCodec.unit(instance);
+        SERIALIZER = new RecipeSerializer(MAP_CODEC, STREAM_CODEC);
     }
 }
