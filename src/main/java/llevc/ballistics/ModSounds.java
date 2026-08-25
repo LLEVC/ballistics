@@ -3,12 +3,12 @@ package llevc.ballistics;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 public class ModSounds {
     private static SoundEvent registerSound(String id) {
-        ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, id);
+        Identifier identifier = Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, id);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, identifier, SoundEvent.createVariableRangeEvent(identifier));
     }
 

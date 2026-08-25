@@ -1,11 +1,10 @@
 package llevc.ballistics;
 
-import llevc.ballistics.effects.Explode;
 import llevc.ballistics.items.FireworkLauncherItem;
 import llevc.ballistics.items.FlintlockItem;
 import llevc.ballistics.items.SmokeItem;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.impl.item.EnchantmentUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -18,7 +17,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.effect.MobEffect;
@@ -44,100 +43,10 @@ import java.util.function.Function;
 
 public class ModItems {
     public static <GenericItem extends Item> GenericItem register(String name, Function<Item.Properties, GenericItem> itemFactory, Item.Properties settings) {
-        ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, name));
+        ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, name));
         GenericItem item = itemFactory.apply(settings.setId(itemKey));
         Registry.register(BuiltInRegistries.ITEM, itemKey, item);
         return item;
-    }
-
-    public static void initialize() {
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsItemGroupKey,BallisticsItemGroup);
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsFlaskItemGroupKey,BallisticsFlaskItemGroup);
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsBakedItemGroupKey,BallisticsBakedItemGroup);
-
-        ItemGroupEvents.modifyEntriesEvent(BallisticsItemGroupKey).register(itemGroup -> {
-            itemGroup.accept(rhGlove);
-            itemGroup.accept(FireworkLauncher);
-            itemGroup.accept(Flintlock);
-            itemGroup.accept(Ball);
-            itemGroup.accept(flintlockHammer);
-            itemGroup.accept(flintlockBarrel);
-            itemGroup.accept(DrinkMixer);
-            itemGroup.accept(EmptyFlask);
-            itemGroup.accept(DragonsFlask);
-            itemGroup.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
-            itemGroup.accept(pick);
-            itemGroup.accept(cig);
-            itemGroup.accept(vape);
-            itemGroup.accept(cartridge);
-            itemGroup.accept(snortable);
-        });
-        ItemGroupEvents.modifyEntriesEvent(BallisticsFlaskItemGroupKey).register(itemGroup -> {
-            itemGroup.accept(DrinkMixer);
-            itemGroup.accept(EmptyFlask);
-            itemGroup.accept(DragonsFlask);
-            for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
-                Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
-                if (wchat.isPresent()) {
-                    Potion hey = wchat.get().value();
-                    itemGroup.accept(PotionContents.createItemStack(Flask,Holder.direct(hey)));
-                }
-            }
-        });
-        ItemGroupEvents.modifyEntriesEvent(BallisticsBakedItemGroupKey).register(itemGroup -> {
-            itemGroup.accept(pick);
-            for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
-                Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
-                if (wchat.isPresent()) {
-                    Potion hey = wchat.get().value();
-                    itemGroup.accept(PotionContents.createItemStack(pick,Holder.direct(hey)));
-                }
-            }
-            itemGroup.accept(cig);
-            for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
-                Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
-                if (wchat.isPresent()) {
-                    Potion hey = wchat.get().value();
-                    ItemStack yo = PotionContents.createItemStack(cig,Holder.direct(hey));
-                    yo.set(DataComponents.ITEM_NAME,Component.translatable("item.ballistics.custom_cig"));
-                    itemGroup.accept(yo);
-                }
-            }
-            itemGroup.accept(vape);
-            for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
-                Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
-                if (wchat.isPresent()) {
-                    Potion hey = wchat.get().value();
-                    itemGroup.accept(PotionContents.createItemStack(vape,Holder.direct(hey)));
-                }
-            }
-            itemGroup.accept(cartridge);
-            for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
-                Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
-                if (wchat.isPresent()) {
-                    Potion hey = wchat.get().value();
-                    itemGroup.accept(PotionContents.createItemStack(cartridge,Holder.direct(hey)));
-                }
-            }
-            itemGroup.accept(snortable);
-            for (int i = 0; i < BuiltInRegistries.BLOCK.size(); i++) {
-                Optional<Holder.Reference<Block>> wchat = BuiltInRegistries.BLOCK.get(i);
-                if (wchat.isPresent()) {
-                    Block hey = wchat.get().value();
-                    itemGroup.accept(createSnortable(hey));
-                }
-            }
-            for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
-                Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
-                if (wchat.isPresent()) {
-                    Potion hey = wchat.get().value();
-                    ItemStack yo = PotionContents.createItemStack(snortable,Holder.direct(hey));
-                    yo.set(DataComponents.DYED_COLOR,new DyedItemColor(yo.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY).getColorOr(CommonColors.WHITE)));
-                    yo.set(DataComponents.ITEM_NAME, Component.translatable("item.ballistics.snortable").append(hey.name()));
-                    itemGroup.accept(yo);
-                }
-            }
-        });
     }
 
     public static final Item EmptyFlask = register(
@@ -165,7 +74,6 @@ public class ModItems {
             new Item.Properties()
                     .stacksTo(1)
                     .component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
-                    .craftRemainder(ModItems.DrinkMixer)
     );
     public static final Item rhGlove = register(
             "rh_glove", //stands for Rocket Handling Glove btw
@@ -209,15 +117,8 @@ public class ModItems {
     //potions
     public static final Potion MixedPotion = Registry.register(
             BuiltInRegistries.POTION,
-            ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),
+            Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "mixed"),
             new Potion("mixed")
-    );
-    public static final Holder<MobEffect> ExplodePotionEffect =
-            Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"), new Explode(MobEffectCategory.HARMFUL, CommonColors.SOFT_RED));
-    public static final Potion ExplosionPotion = Registry.register(
-            BuiltInRegistries.POTION,
-            ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "explode"),
-            new Potion("explode",new MobEffectInstance(ExplodePotionEffect))
     );
 
     //the baked shi
@@ -273,8 +174,6 @@ public class ModItems {
             effectInstanceList.add(new MobEffectInstance(MobEffects.INFESTED,60*20));
         } else if (block instanceof SlimeBlock) { // slimme
             effectInstanceList.add(new MobEffectInstance(MobEffects.OOZING,600));
-        } else if (block instanceof TntBlock) {
-            effectInstanceList.add(new MobEffectInstance(ModItems.ExplodePotionEffect));
         } else if (block instanceof WebBlock) { // cobweb
             effectInstanceList.add(new MobEffectInstance(MobEffects.WEAVING,1200));
         }
@@ -293,10 +192,97 @@ public class ModItems {
         return yes;
     }
 
-    public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
-    public static final CreativeModeTab BallisticsItemGroup = FabricItemGroup.builder().icon(() -> new ItemStack(Items.FIREWORK_ROCKET)).title(Component.translatable("itemGroup.ballistics")).build();
-    public static final ResourceKey<CreativeModeTab> BallisticsFlaskItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_flasks"));
-    public static final CreativeModeTab BallisticsFlaskItemGroup = FabricItemGroup.builder().icon(() -> new ItemStack(EmptyFlask)).title(Component.translatable("itemGroup.ballistics_flasks")).build();
-    public static final ResourceKey<CreativeModeTab> BallisticsBakedItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_geeked"));
-    public static final CreativeModeTab BallisticsBakedItemGroup = FabricItemGroup.builder().icon(() -> new ItemStack(vape)).title(Component.translatable("itemGroup.ballistics_geeked")).build();
+    public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
+    public static final CreativeModeTab BallisticsItemGroup = FabricCreativeModeTab.builder().icon(() -> new ItemStack(Items.FIREWORK_ROCKET)).displayItems((params, output) -> {
+        output.accept(rhGlove);
+        output.accept(FireworkLauncher);
+        output.accept(Flintlock);
+        output.accept(Ball);
+        output.accept(flintlockHammer);
+        output.accept(flintlockBarrel);
+        output.accept(DrinkMixer);
+        output.accept(EmptyFlask);
+        output.accept(DragonsFlask);
+        output.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
+        output.accept(pick);
+        output.accept(cig);
+        output.accept(vape);
+        output.accept(cartridge);
+        output.accept(snortable);
+    }).title(Component.translatable("itemGroup.ballistics")).build();
+
+    public static final ResourceKey<CreativeModeTab> BallisticsFlaskItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_flasks"));
+    public static final CreativeModeTab BallisticsFlaskItemGroup = FabricCreativeModeTab.builder().icon(() -> new ItemStack(EmptyFlask)).displayItems((params,output) -> {
+        output.accept(DrinkMixer);
+        output.accept(EmptyFlask);
+        output.accept(DragonsFlask);
+        for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
+            Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
+            if (wchat.isPresent()) {
+                Potion hey = wchat.get().value();
+                output.accept(PotionContents.createItemStack(Flask,Holder.direct(hey)));
+            }
+        }}).title(Component.translatable("itemGroup.ballistics_flasks")).build();
+
+    public static final ResourceKey<CreativeModeTab> BallisticsBakedItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_geeked"));
+    public static final CreativeModeTab BallisticsBakedItemGroup = FabricCreativeModeTab.builder().icon(() -> new ItemStack(vape)).displayItems((params,output) -> {
+        output.accept(pick);
+        for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
+            Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
+            if (wchat.isPresent()) {
+                Potion hey = wchat.get().value();
+                output.accept(PotionContents.createItemStack(pick,Holder.direct(hey)));
+            }
+        }
+        output.accept(cig);
+        for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
+            Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
+            if (wchat.isPresent()) {
+                Potion hey = wchat.get().value();
+                ItemStack yo = PotionContents.createItemStack(cig,Holder.direct(hey));
+                yo.set(DataComponents.ITEM_NAME,Component.translatable("item.ballistics.custom_cig"));
+                output.accept(yo);
+            }
+        }
+        output.accept(vape);
+        for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
+            Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
+            if (wchat.isPresent()) {
+                Potion hey = wchat.get().value();
+                output.accept(PotionContents.createItemStack(vape,Holder.direct(hey)));
+            }
+        }
+        output.accept(cartridge);
+        for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
+            Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
+            if (wchat.isPresent()) {
+                Potion hey = wchat.get().value();
+                output.accept(PotionContents.createItemStack(cartridge,Holder.direct(hey)));
+            }
+        }
+        output.accept(snortable);
+        //for (int i = 0; i < BuiltInRegistries.BLOCK.size(); i++) {
+        //    Optional<Holder.Reference<Block>> wchat = BuiltInRegistries.BLOCK.get(i);
+        //    if (wchat.isPresent()) {
+        //        Block hey = wchat.get().value();
+        //        ItemStack woah = createSnortable(hey);
+        //        output.accept(woah);
+        //    }
+        //}
+        for (int i = 0; i < BuiltInRegistries.POTION.size(); i++) {
+            Optional<Holder.Reference<Potion>> wchat = BuiltInRegistries.POTION.get(i);
+            if (wchat.isPresent()) {
+                Potion hey = wchat.get().value();
+                ItemStack yo = PotionContents.createItemStack(snortable,Holder.direct(hey));
+                yo.set(DataComponents.DYED_COLOR,new DyedItemColor(yo.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY).getColorOr(CommonColors.WHITE)));
+                yo.set(DataComponents.ITEM_NAME, Component.translatable("item.ballistics.snortable").append(hey.name()));
+                output.accept(yo);
+            }
+        }}).title(Component.translatable("itemGroup.ballistics_geeked")).build();
+
+    public static void initialize() {
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsItemGroupKey,BallisticsItemGroup);
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsFlaskItemGroupKey,BallisticsFlaskItemGroup);
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,BallisticsBakedItemGroupKey,BallisticsBakedItemGroup);
+    }
 }

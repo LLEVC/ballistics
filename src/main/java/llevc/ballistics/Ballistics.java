@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,14 +27,14 @@ public class Ballistics implements ModInitializer {
 		ModSounds.initialize();
 		ModDamageTypes.initialize();
 
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlaskRecipeSerializer.ID, FlaskRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, DrinkMixerRecipeSerializer.ID, DrinkMixerRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, MixedDrinkRecipeSerializer.ID, MixedDrinkRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, SnortableRecipeSerializer.ID, SnortableRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, PickRecipeSerializer.ID, PickRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, CartridgeRecipeSerializer.ID, CartridgeRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, GeekedRecipeSerializer.ID, GeekedRecipeSerializer.INSTANCE);
-		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, FlintlockLoadRecipeSerializer.ID, FlintlockLoadRecipeSerializer.INSTANCE);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_flask"), FlaskRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_drink_mixer"), DrinkMixerRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_mixed_drink"), MixedDrinkRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_snortable"), SnortableRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_pick"), PickRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_cartridge_fill"), CartridgeRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_geeked"), GeekedRecipe.SERIALIZER);
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_flintlock_load"), FlintlockLoadRecipe.SERIALIZER);
 
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}

@@ -1,8 +1,11 @@
 package llevc.ballistics.recipes;
 
+import com.mojang.serialization.MapCodec;
 import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -14,8 +17,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class FlaskRecipe extends CustomRecipe {
-    public FlaskRecipe(CraftingBookCategory craftingBookCategory) {
-        super(craftingBookCategory);
+    public FlaskRecipe() {
+        super();
     }
 
     public boolean matches(CraftingInput recipeInput, Level level) {
@@ -53,7 +56,7 @@ public class FlaskRecipe extends CustomRecipe {
         return (potion && flask && recipeInput.ingredientCount() <= 2);
     }
 
-    public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput recipeInput) {
         ItemStack result = ItemStack.EMPTY;
         ItemStack potion = ItemStack.EMPTY;
         boolean flask = false;
@@ -112,8 +115,19 @@ public class FlaskRecipe extends CustomRecipe {
         return result;
     }
 
+    public static final FlaskRecipe instance = new FlaskRecipe();
+    public static final MapCodec<FlaskRecipe> MAP_CODEC;
+    public static final StreamCodec<RegistryFriendlyByteBuf, FlaskRecipe> STREAM_CODEC;
+    public static final RecipeSerializer<FlaskRecipe> SERIALIZER;
+
     @Override
-    public RecipeSerializer<FlaskRecipe> getSerializer() {
-        return FlaskRecipeSerializer.INSTANCE;
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
+        return SERIALIZER;
+    }
+
+    static {
+        MAP_CODEC = MapCodec.unit(instance);
+        STREAM_CODEC = StreamCodec.unit(instance);
+        SERIALIZER = new RecipeSerializer(MAP_CODEC, STREAM_CODEC);
     }
 }
