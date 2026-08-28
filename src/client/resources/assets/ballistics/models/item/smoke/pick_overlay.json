@@ -1,8 +1,0 @@
-{
-	"format_version": "1.21.11",
-	"credit": "Made with Blockbench",
-	"parent": "ballistics:item/smoke/cig",
-	"textures": {
-		"layer0": "ballistics:item/smoke/pick_overlay"
-	}
-}

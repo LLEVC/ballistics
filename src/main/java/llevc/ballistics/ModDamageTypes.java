@@ -10,7 +10,7 @@ import java.rmi.registry.Registry;
 
 public class ModDamageTypes {
 
-    public static ResourceKey<DamageType> lungCancer = ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath("ballistics","lungs"));
+    //public static ResourceKey<DamageType> lungCancer = ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath("ballistics","lungs"));
 
     public static void initialize() {
     }

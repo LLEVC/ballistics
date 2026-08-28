@@ -31,12 +31,6 @@
   "item.minecraft.lingering_potion.effect.mixed": "Mixed Lingering Potion",
   "item.minecraft.tipped_arrow.effect.mixed": "Mixed Arrow",
   "item.ballistics.flask.effect.mixed": "Mixed Flask",
-  "effect.ballistics.explode": "Explode",
-  "item.minecraft.potion.effect.explode": "Exploding Potion",
-  "item.minecraft.splash_potion.effect.explode": "Exploding Splash Potion",
-  "item.minecraft.lingering_potion.effect.explode": "Exploding Lingering Potion",
-  "item.minecraft.tipped_arrow.effect.explode": "Exploding Arrow",
-  "item.ballistics.flask.effect.explode": "Exploding Flask",
 
   "item.ballistics.flask": "Flask",
   "item.ballistics.flask.effect.awkward": "Awkward Flask",
@@ -64,12 +58,5 @@
   "item.ballistics.flask.effect.water_breathing": "Flask of Water Breathing",
   "item.ballistics.flask.effect.weakness": "Flask of Weakness",
   "item.ballistics.flask.effect.weaving": "Flask of Weaving",
-  "item.ballistics.flask.effect.wind_charged": "Flask of Wind Charging",
-
-  "item.ballistics.snortable": "Snortable ",
-  "item.ballistics.custom_cig": "Custom Cig",
-  "item.ballistics.cig": "Cig",
-  "item.ballistics.vape": "Vape",
-  "item.ballistics.pick": "Pick",
-  "item.ballistics.cartridge": "Cartridge"
+  "item.ballistics.flask.effect.wind_charged": "Flask of Wind Charging"
 }

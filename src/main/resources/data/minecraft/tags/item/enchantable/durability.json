@@ -2,9 +2,6 @@
   "replace": false,
   "values": [
     "ballistics:rh_glove",
-    "ballistics:flintlock",
-    "ballistics:pick",
-    "ballistics:cig",
-    "ballistics:vape"
+    "ballistics:flintlock"
   ]
 }
