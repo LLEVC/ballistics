@@ -89,7 +89,7 @@ public class DrinkMixerRecipe extends CustomRecipe {
                     );
                     effects.set(mindex,newOne);
                 } else {
-                    effects.add(sup);
+                    effects.add(sup.withScaledDuration(1.0f));
                     effectsString.add(sup.getEffect().getRegisteredName());
                 }
                 level = level+1+sup.getAmplifier();
