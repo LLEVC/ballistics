@@ -2,7 +2,6 @@
   "replace": false,
   "values": [
     "ballistics:bluntness",
-    "ballistics:deadeye",
     "ballistics:graceful",
     "ballistics:gripping",
     "ballistics:handling",

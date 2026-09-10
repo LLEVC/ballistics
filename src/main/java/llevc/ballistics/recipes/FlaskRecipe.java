@@ -106,7 +106,7 @@ public class FlaskRecipe extends CustomRecipe {
                 gamer = PotionContents.createItemStack(ModItems.Flask, death.potion().orElse(Potions.WATER));
             }
             gamer.set(DataComponents.POTION_CONTENTS, death);
-            if (level > 2*(2+effects.size())) {
+            if (level > 2*(effects.size())) {
                 gamer.set(DataComponents.RARITY,Rarity.RARE);
             }
             result = gamer;

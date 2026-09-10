@@ -101,7 +101,8 @@ public class ModItems {
     public static final Item FireworkLauncher = register(
             "firework_launcher",
             FireworkLauncherItem::new,
-            new Item.Properties().stacksTo(1).durability(465).component(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY).enchantable(1).component(DataComponents.LORE,new ItemLore(List.of(Component.literal("literally just a crossbow which only accepts fireworks lmao"))))
+            new Item.Properties().stacksTo(1).durability(465).component(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY).enchantable(1)
+                    .component(DataComponents.LORE,new ItemLore(List.of(Component.literal("literally just a crossbow which only accepts fireworks lmao"))))
     );
 
     //potions
@@ -114,7 +115,6 @@ public class ModItems {
     public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
     public static final CreativeModeTab BallisticsItemGroup = FabricCreativeModeTab.builder().icon(() -> new ItemStack(Items.FIREWORK_ROCKET)).displayItems((params, output) -> {
         output.accept(rhGlove);
-        output.accept(FireworkLauncher);
         output.accept(Flintlock);
         output.accept(Ball);
         output.accept(flintlockHammer);
@@ -123,6 +123,7 @@ public class ModItems {
         output.accept(EmptyFlask);
         output.accept(DragonsFlask);
         output.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
+        output.accept(FireworkLauncher);
     }).title(Component.translatable("itemGroup.ballistics")).build();
 
     public static final ResourceKey<CreativeModeTab> BallisticsFlaskItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics_flasks"));
