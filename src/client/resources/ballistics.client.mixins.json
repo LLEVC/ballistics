@@ -1,9 +1,10 @@
 {
 	"required": true,
 	"package": "llevc.ballistics.mixin.client",
-	"compatibilityLevel": "JAVA_21",
+	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ExampleClientMixin"
+		"MinecraftClassMixin",
+		"CrosshairMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

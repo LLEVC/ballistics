@@ -1,8 +1,11 @@
 package llevc.ballistics;
 
+import llevc.ballistics.networking.ServerboundChargePacket;
 import llevc.ballistics.recipes.*;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -31,6 +34,16 @@ public class Ballistics implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_drink_mixer"), DrinkMixerRecipe.SERIALIZER);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_mixed_drink"), MixedDrinkRecipe.SERIALIZER);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_flintlock_load"), FlintlockLoadRecipe.SERIALIZER);
+
+		PayloadTypeRegistry.serverboundPlay().register(ServerboundChargePacket.TYPE,ServerboundChargePacket.CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(ServerboundChargePacket.TYPE, (payload, context) -> {
+			if (payload.integer() == 0) {
+				((PlayerInterface) context.player()).ballistics$resetThrowCharge();
+			} else {
+				((PlayerInterface) context.player()).ballistics$startThrowCharge(payload.integer());
+			}
+		});
 
 		LOGGER.info("if you read this you're prolly gonna be touched within the next 16 hours");
 	}

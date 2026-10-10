@@ -9,7 +9,6 @@
     "ItemDropMomentumMixin",
     "ItemEntityMixin",
     "PlayerMixin",
-    "PotionBrewingMixin",
     "PotionMixin"
   ],
   "injectors": {
@@ -17,5 +16,5 @@
   },
   "overwrites": {
     "requireAnnotations": true
-	}
+  }
 }
