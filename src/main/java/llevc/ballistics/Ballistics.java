@@ -41,7 +41,7 @@ public class Ballistics implements ModInitializer {
 			if (payload.integer() == 0) {
 				((PlayerInterface) context.player()).ballistics$resetThrowCharge();
 			} else {
-				((PlayerInterface) context.player()).ballistics$startThrowCharge(payload.integer());
+				((PlayerInterface) context.player()).ballistics$startThrowCharge(context.player().tickCount);
 			}
 		});
 

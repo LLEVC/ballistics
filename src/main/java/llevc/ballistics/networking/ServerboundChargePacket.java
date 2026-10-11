@@ -4,12 +4,9 @@ import llevc.ballistics.Ballistics;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.game.GamePacketTypes;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 
 public record ServerboundChargePacket(int integer) implements CustomPacketPayload {
     public static final Identifier chargePacketID = Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,"charge_packet");
@@ -21,7 +18,7 @@ public record ServerboundChargePacket(int integer) implements CustomPacketPayloa
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 }

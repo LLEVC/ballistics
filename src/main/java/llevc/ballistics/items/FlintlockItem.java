@@ -3,14 +3,11 @@ package llevc.ballistics.items;
 import llevc.ballistics.FlintlockProjectile;
 import llevc.ballistics.ModItems;
 import llevc.ballistics.ModSounds;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -21,13 +18,11 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Iterator;
 import java.util.List;
@@ -63,21 +58,27 @@ public class FlintlockItem extends ProjectileWeaponItem {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         if (isCharged(itemStack)) {
             setCharged(itemStack, false);
-
             if (isLoaded(itemStack)) {
                 setLoaded(itemStack,false);
                 if (level instanceof ServerLevel serverLevel) {
                     this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, List.of(new ItemStack(ModItems.Ball)), 5.0f, 1.0F, true, null);
+                    level.playSound(null,player.blockPosition(),ModSounds.FlintlockShoot,player.getSoundSource(),2.0f,1.0f);
                 }
-                level.playSound(null,player.blockPosition(),ModSounds.FlintlockShoot,player.getSoundSource(),0.5f,1.0f);
+                //level.playPlayerSound(ModSounds.StereoFlintlockShoot,player.getSoundSource(),0.5f,1.0f);
                 return InteractionResult.SUCCESS;
             } else {
-                level.playSound(null,player.blockPosition(),ModSounds.FlintlockDryShoot,player.getSoundSource(),0.5f,1.0f);
+                if (level instanceof ServerLevel) {
+                    level.playSound(null,player.blockPosition(),ModSounds.FlintlockDryShoot,player.getSoundSource(),1.0f,1.0f);
+                }
+                //level.playPlayerSound(ModSounds.StereoFlintlockDryShoot,player.getSoundSource(),0.5f,1.0f);
                 return InteractionResult.PASS;
             }
         } else {
             player.startUsingItem(interactionHand);
-            level.playSound(null,player.blockPosition(),ModSounds.FlintlockClick,player.getSoundSource(),0.5f,1.0f);
+            if (level instanceof ServerLevel) {
+                level.playSound(null,player.blockPosition(),ModSounds.FlintlockClick,player.getSoundSource(),1.0f,1.0f);
+            }
+            //level.playPlayerSound(ModSounds.StereoFlintlockClick,player.getSoundSource(),0.5f,1.0f);
             return InteractionResult.PASS;
         }
     }
@@ -133,7 +134,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
             return false;
         }
         if (yo.copyTag().getBoolean("charged").isPresent()) {
-            return yo.copyTag().getBoolean("charged").get().booleanValue();
+            return yo.copyTag().getBoolean("charged").get();
         }
         return false;
     }
@@ -167,7 +168,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
 
     @Override
     protected @NotNull Projectile createProjectile(Level level, LivingEntity livingEntity, ItemStack itemStack, ItemStack itemStack2, boolean bl) {
-        FlintlockProjectile flintlockProjectile = new FlintlockProjectile(level,livingEntity, Vec3.ZERO);
+        FlintlockProjectile flintlockProjectile = new FlintlockProjectile(level,livingEntity,Vec3.ZERO);
         flintlockProjectile.setPos(livingEntity.getEyePosition());
         return flintlockProjectile;
     }

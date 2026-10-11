@@ -6,10 +6,14 @@
     "BottleItemMixin",
     "FireworkItemMixin",
     "FireworkMixin",
+    "FixParticleTrailPls",
     "ItemDropMomentumMixin",
     "ItemEntityMixin",
     "PlayerMixin",
-    "PotionMixin"
+    "PotionMixin",
+    "ProjectileMixin",
+    "TNTminecartMixin",
+    "TNTmixin"
   ],
   "injectors": {
     "defaultRequire": 1

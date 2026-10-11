@@ -15,6 +15,9 @@ public class ModSounds {
     public static final SoundEvent FlintlockClick = registerSound("flintlock_click");
     public static final SoundEvent FlintlockShoot = registerSound("flintlock_shoot");
     public static final SoundEvent FlintlockDryShoot = registerSound("flintlock_dry_shoot");
+    public static final SoundEvent StereoFlintlockClick = registerSound("stereo/flintlock_click");
+    public static final SoundEvent StereoFlintlockShoot = registerSound("stereo/flintlock_shoot");
+    public static final SoundEvent StereoFlintlockDryShoot = registerSound("stereo/flintlock_dry_shoot");
     public static final SoundEvent FlintlockHit = registerSound("flintlock_hit");
     public static final SoundEvent FlintlockMiss = registerSound("flintlock_miss");
 

@@ -24,9 +24,9 @@ public class MinecraftClassMixin {
 
 	@Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;dropItem(Lnet/minecraft/client/player/LocalPlayer;Z)V"), method = "handleKeybinds")
 	private void init(MultiPlayerGameMode instance, LocalPlayer player, boolean all) {
-		if (all) {
-			player.connection.handleCustomPayload(new ServerboundChargePacket(0));
-			instance.dropItem(player,true);
-		}
+		//if (all) {
+		//	player.connection.handleCustomPayload(new ServerboundChargePacket(0));
+		//	instance.dropItem(player,true);
+		//}
 	}
 }
