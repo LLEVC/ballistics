@@ -29,6 +29,7 @@ public class Ballistics implements ModInitializer {
 		ModItems.initialize();
 		ModSounds.initialize();
 		ModDamageTypes.initialize();
+		ModEnchantmentEffects.init();
 
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_flask"), FlaskRecipe.SERIALIZER);
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_drink_mixer"), DrinkMixerRecipe.SERIALIZER);

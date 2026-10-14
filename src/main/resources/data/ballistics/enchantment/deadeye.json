@@ -18,5 +18,7 @@
   ],
   "supported_items": "#ballistics:enchantable/flintlock",
   "weight": 10,
-  "effects": {}
+  "effects": {
+    "ballistics:flintlock_raycast": {}
+  }
 }

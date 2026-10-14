@@ -4,14 +4,17 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BottleItemMixin",
+    "BrewingRecipeMixin",
     "FireworkItemMixin",
     "FireworkMixin",
     "FixParticleTrailPls",
     "ItemDropMomentumMixin",
     "ItemEntityMixin",
+    "LivingEntityMixin",
     "PlayerMixin",
     "PotionMixin",
     "ProjectileMixin",
+    "StandingWallBlockItemMixin",
     "TNTminecartMixin",
     "TNTmixin"
   ],

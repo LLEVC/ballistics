@@ -41,7 +41,7 @@ public abstract class CrosshairMixin {
 
     @Unique
     public float dayum(LocalPlayer player) {
-        return Math.clamp((float) (player.tickCount-BallisticsClient.throwStartTick)/40f,0.0f,1.0f);
+        return Math.clamp((float) (player.tickCount-BallisticsClient.throwStartTick)/(float) BallisticsClient.maxChargeTime,0.0f,1.0f);
     }
 
     public float holy = 0f;

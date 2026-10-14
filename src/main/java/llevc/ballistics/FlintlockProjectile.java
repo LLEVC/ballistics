@@ -57,10 +57,8 @@ public class FlintlockProjectile extends AbstractHurtingProjectile implements It
 
             DamageSource damageSource = this.damageSources().mobProjectile(this,entity1.asLivingEntity());
             serverLevel.playSound(null,entityHitResult.getEntity().blockPosition(),ModSounds.FlintlockHit, entity1.getSoundSource(),2.0f,1.0f);
-            entity.hurtServer(serverLevel,damageSource,16);
-            if (this.isOnFire()) {
-                entity.setRemainingFireTicks(entity.getRemainingFireTicks()+40);
-            }
+            entity.hurtServer(serverLevel,damageSource, (float) (16*(Math.clamp(this.getDeltaMovement().length(),1,2^12))));
+            if (this.isOnFire()) entity.setRemainingFireTicks(entity.getRemainingFireTicks()+40);
             if (entity instanceof LivingEntity livingEntity) {
                 if (livingEntity.isBlocking()) {
                     BlocksAttacks blocksAttacks = livingEntity.getItemBlockingWith().get(DataComponents.BLOCKS_ATTACKS);

@@ -1,24 +1,44 @@
 package llevc.ballistics;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.FireworkExplosion;
+import net.minecraft.world.item.component.Fireworks;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseTorchBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.TorchBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
 
 public class ThrownItemProjectile extends ThrowableItemProjectile {
     public final float bobOffs;
@@ -53,33 +73,127 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
 
     }
 
-    private ItemEntity createItemEntity() {
-        ItemStack itemStack = getItem();
+    private ItemEntity createItemEntity(ItemStack itemStack) {
         ItemEntity bro = new ItemEntity(level(),position().x,position().y,position().z,itemStack);
         ProjectileDeflection.REVERSE.deflect(this,this.getOwner(),random,this.getDeltaMovement());
         bro.setDeltaMovement(this.getDeltaMovement());
         return bro;
     }
 
+    private void spawnItemEntity(ItemStack itemStack) {
+        ItemEntity bro = createItemEntity(itemStack);
+        level().addFreshEntity(bro);
+    }
+
+    private void spawnItemEntity() {
+        ItemEntity bro = createItemEntity(getItem());
+        level().addFreshEntity(bro);
+    }
+
+    private boolean fireworkExplosion() {
+        ItemStack itemStack = getItem();
+        if (itemStack.getItem() instanceof FireworkRocketItem) {
+            ItemStack itemStack1 = itemStack.copy();
+            Fireworks fireworks = itemStack.getOrDefault(DataComponents.FIREWORKS,new Fireworks(1, List.of()));
+            itemStack1.set(DataComponents.FIREWORKS,new Fireworks(-2,fireworks.explosions()));
+            FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(level(), itemStack1, Objects.requireNonNull(getOwner()),position().x,position().y,position().z,false);
+            fireworkRocketEntity.setPos(position());
+            fireworkRocketEntity.setOwner(getOwner());
+            Projectile.spawnProjectile(fireworkRocketEntity,((ServerLevel)level()),itemStack);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean placeFluid(BlockPos pos, @Nullable Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.getItem() instanceof DispensibleContainerItem bucketItem) {
+            Vec3i off = direction != null ? direction.getStep() : Vec3i.ZERO;
+            bucketItem.emptyContents((LivingEntity) getOwner(),level(),pos.offset(off),null);
+            bucketItem.checkExtraContent((LivingEntity) getOwner(),level(),itemStack,pos.offset(off));
+            //Ballistics.LOGGER.info(String.valueOf(pos.offset(off)));
+            spawnItemEntity(new ItemStack(Items.BUCKET));
+            return true;
+        }
+        return false;
+    }
+
+    private Rotation getDirectionRotation(Direction direction) {
+        Rotation rotation = Rotation.NONE;
+        switch (direction) {
+            //case NORTH -> rotation = Rotation.NONE;
+            case EAST -> rotation = Rotation.CLOCKWISE_90;
+            case SOUTH -> rotation = Rotation.CLOCKWISE_180;
+            case WEST -> rotation = Rotation.COUNTERCLOCKWISE_90;
+        }
+        return rotation;
+    }
+
+    private boolean isTorch() {
+        ItemStack itemStack = getItem();
+        if (itemStack.getItem() instanceof StandingAndWallBlockItem blockItem) {
+            return blockItem.getBlock() instanceof BaseTorchBlock;
+        }
+        return false;
+    }
+
+    private boolean placeTorch(BlockPos pos, Direction direction) {
+        ItemStack itemStack = getItem();
+        if (isTorch() && direction != Direction.DOWN) {
+            BlockItem blockItem = (BlockItem) itemStack.getItem();
+            Vec3i off = direction.getStep();
+            level().destroyBlock(pos.offset(off),true);
+            level().setBlockAndUpdate(pos.offset(off),direction == Direction.UP ? blockItem.getBlock().defaultBlockState() : ((StandingWallBlockItemInterface) blockItem).ballistics$getWallBlock().defaultBlockState().rotate(getDirectionRotation(direction)));
+            return true;
+        }
+        return false;
+    }
+
+    private void attemptEffect(ItemStack itemStack, Item item, MobEffectInstance mobEffectInstance, List<MobEffectInstance> effectList) {
+        if (itemStack.is(item)) effectList.add(mobEffectInstance);
+    }
+
+    private List<MobEffectInstance> processPotions(ItemStack itemStack) {
+        List<MobEffectInstance> effectList = new java.util.ArrayList<>(List.of());
+        attemptEffect(itemStack,Items.SLIME_BLOCK,new MobEffectInstance(MobEffects.OOZING,20*20),effectList);
+        attemptEffect(itemStack,Items.SLIME_BALL,new MobEffectInstance(MobEffects.OOZING,60*20),effectList);
+        attemptEffect(itemStack,Items.WITHER_ROSE,new MobEffectInstance(MobEffects.WITHER,3*20),effectList);
+        return effectList;
+    }
+
     protected void onHitEntity(final EntityHitResult hitResult) {
         if (!level().isClientSide()) {
             ItemStack itemStack = getItem();
             Entity entity = hitResult.getEntity();
+            if (fireworkExplosion()) return;
+            if (placeFluid(hitResult.getEntity().blockPosition(),null)) return;
             int damage = 1;
             entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) Math.clamp(Math.ceil(damage * this.getDeltaMovement().length()),0,Integer.MAX_VALUE));
-            ItemEntity bro = createItemEntity();
-            level().addFreshEntity(bro);
-            this.kill((ServerLevel) level());
+            if (isTorch()) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+60 : 60);
+            if (entity instanceof LivingEntity livingEntity) {
+                List<MobEffectInstance> effectList = processPotions(itemStack);
+                for (MobEffectInstance mobEffectInstance : effectList) {
+                    livingEntity.addEffect(mobEffectInstance);
+                }
+            }
+            spawnItemEntity();
         }
     }
 
     @Override
     protected void onHitBlock(BlockHitResult hitResult) {
         if (!level().isClientSide()) {
-            ItemEntity bro = createItemEntity();
-            level().addFreshEntity(bro);
-            this.kill((ServerLevel) level());
+            if (fireworkExplosion()) return;
+            if (placeFluid(hitResult.getBlockPos(),hitResult.getDirection())) return;
+            if (placeTorch(hitResult.getBlockPos(),hitResult.getDirection())) return;
+            spawnItemEntity();
         }
+    }
+
+    @Override
+    protected void onHit(HitResult hitResult) {
+        super.onHit(hitResult);
+        if (!level().isClientSide()) this.kill((ServerLevel) level());
     }
 
     protected double getDefaultGravity() {

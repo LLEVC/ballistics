@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.event.client.player.ClientHotbarScrollEvents;
 import net.fabricmc.fabric.api.event.client.player.ClientPlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 public class BallisticsClient implements ClientModInitializer {
 	public static int throwStartTick = 0;
 	public static boolean isCharging = false;
+	public static int maxChargeTime = 40;
 
 	public static void startCharging(LocalPlayer localPlayer) {
 		//Ballistics.LOGGER.info("start charge");

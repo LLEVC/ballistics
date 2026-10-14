@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -38,6 +39,8 @@ public class ModItems {
         Registry.register(BuiltInRegistries.ITEM, itemKey, item);
         return item;
     }
+
+    public static final TagKey<Item> projectileThrowBlacklist = TagKey.create(Registries.ITEM,Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,"projectile_throw_blacklist"));
 
     public static final Item EmptyFlask = register(
             "empty_flask",

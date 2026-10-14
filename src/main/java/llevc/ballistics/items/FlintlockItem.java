@@ -1,6 +1,7 @@
 package llevc.ballistics.items;
 
 import llevc.ballistics.FlintlockProjectile;
+import llevc.ballistics.ModEnchantmentEffects;
 import llevc.ballistics.ModItems;
 import llevc.ballistics.ModSounds;
 import net.minecraft.core.Holder;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -90,16 +92,7 @@ public class FlintlockItem extends ProjectileWeaponItem {
         int maxhey = 20;
         boolean sonofa = false;
 
-        if (itemStack.has(DataComponents.ENCHANTMENTS)) {
-            ItemEnchantments itemEnchantments = itemStack.getOrDefault(DataComponents.ENCHANTMENTS,ItemEnchantments.EMPTY);
-            Iterator<Holder<Enchantment>> wow = itemEnchantments.keySet().iterator();
-            while (wow.hasNext()) {
-                Holder<Enchantment> heyo = wow.next();
-                if (heyo.is(Identifier.fromNamespaceAndPath("ballistics","quickload"))) {
-                    sonofa = true;
-                }
-            }
-        }
+        if (itemStack.has(DataComponents.ENCHANTMENTS)) sonofa = EnchantmentHelper.has(itemStack, ModEnchantmentEffects.quickload);
 
         if (hey > maxhey && !isCharged(itemStack)) {
             setCharged(itemStack,true);

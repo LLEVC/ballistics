@@ -206,7 +206,7 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 					}
 
 					fireworkRocketEntity.flyDist = this.flyDist;
-					fireworkRocketEntity.setSilent(true);
+					//fireworkRocketEntity.setSilent(true);
 					fireworkRocketEntity.setOwner(this.getOwner());
 					level().addFreshEntity(fireworkRocketEntity);
 					this.kill((ServerLevel) level());

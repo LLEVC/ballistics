@@ -1,17 +1,20 @@
 package llevc.ballistics.mixin;
 
-import llevc.ballistics.Ballistics;
-import llevc.ballistics.ModEntities;
-import llevc.ballistics.PlayerInterface;
-import llevc.ballistics.ThrownItemProjectile;
+import llevc.ballistics.*;
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
 import java.util.Objects;
 
 @Mixin(LivingEntity.class)
@@ -53,12 +57,24 @@ public abstract class ItemDropMomentumMixin {
             Vec3 newVelo = itemEntity.getDeltaMovement();
             if (turnToProjectile) {
                 if (bih.level() instanceof ServerLevel serverLevel) {
-                    ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile,bih,bih.level(),itemStack);
-                    //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
-                    thrownItemProjectile.setDeltaMovement(newVelo);
-                    thrownItemProjectile.setPos(itemEntity.position());
-                    Projectile.spawnProjectile(thrownItemProjectile,serverLevel,itemStack);
-                    //bih.level().addFreshEntity(thrownItemProjectile);
+                    boolean isFirework = itemStack.getItem() instanceof FireworkRocketItem;
+                    if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!(isFirework) || (bih.isHolding(ModItems.rhGlove) && isFirework))) {
+                        Projectile projectile = projectileItem.asProjectile(serverLevel,itemEntity.position(),itemStack, Direction.NORTH);
+                        //Vec3 viewVector = bih.getViewVector(1.0f);
+                        //projectile.setOwner(bih);
+                        projectile.shootFromRotation(bih,bih.getXRot(),bih.getYRot(),0f,1.5f,1f);
+                        Projectile.spawnProjectile(projectile,serverLevel,itemStack);
+                    } else if (itemStack.getItem() instanceof TridentItem) {
+                        ItemStack returnItemStack = itemStack.consumeAndReturn(1,bih);
+                        Projectile.spawnProjectileFromRotation(ThrownTrident::new,serverLevel,returnItemStack,bih,0,2.5f,1f);
+                    } else {
+                        ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile, bih, bih.level(), itemStack);
+                        //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
+                        thrownItemProjectile.setDeltaMovement(newVelo);
+                        thrownItemProjectile.setPos(itemEntity.position());
+                        Projectile.spawnProjectile(thrownItemProjectile, serverLevel, itemStack);
+                        //bih.level().addFreshEntity(thrownItemProjectile);
+                    }
                 }
                 itemEntity = null;
             }
