@@ -58,15 +58,16 @@ public abstract class ItemDropMomentumMixin {
             if (turnToProjectile) {
                 if (bih.level() instanceof ServerLevel serverLevel) {
                     boolean isFirework = itemStack.getItem() instanceof FireworkRocketItem;
-                    if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!(isFirework) || (bih.isHolding(ModItems.rhGlove) && isFirework))) {
-                        Projectile projectile = projectileItem.asProjectile(serverLevel,itemEntity.position(),itemStack, Direction.NORTH);
-                        //Vec3 viewVector = bih.getViewVector(1.0f);
-                        //projectile.setOwner(bih);
+                    if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!isFirework || bih.isHolding(ModItems.rhGlove))) {
+                        Vec3 viewVector = bih.getViewVector(1.0f);
+                        //Ballistics.LOGGER.info(String.valueOf(viewVector));
+                        Projectile projectile = projectileItem.asProjectile(serverLevel,itemEntity.position().add(viewVector),itemStack, Direction.NORTH);
+                        projectile.setOwner(bih);
                         projectile.shootFromRotation(bih,bih.getXRot(),bih.getYRot(),0f,1.5f,1f);
                         Projectile.spawnProjectile(projectile,serverLevel,itemStack);
                     } else if (itemStack.getItem() instanceof TridentItem) {
-                        ItemStack returnItemStack = itemStack.consumeAndReturn(1,bih);
-                        Projectile.spawnProjectileFromRotation(ThrownTrident::new,serverLevel,returnItemStack,bih,0,2.5f,1f);
+                        ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
+                        Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
                     } else {
                         ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile, bih, bih.level(), itemStack);
                         //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);

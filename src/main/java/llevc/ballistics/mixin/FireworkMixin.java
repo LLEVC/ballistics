@@ -95,11 +95,8 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 						ClipContext heyosssa = new ClipContext(this.position().add(0, this.getBoundingBox().getYsize(), 0), (livingEntity.position().add(0, livingEntity.getBoundingBox().getYsize() / 2, 0)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, thisentity);
 						HitResult hitResult = serverLevel.clip(heyosssa);
 						float sh = 5.0f + freaky.size() * 2.0f;
-						boolean hit = false;
-						if (hitResult.getType() == HitResult.Type.MISS) {
-							hit = true;
-						}
-						if (hit && (!livingEntity.is(getOwner()) || !this.isShotAtAngle())) {
+						boolean hit = hitResult.getType() == HitResult.Type.MISS;
+                        if (hit && (!livingEntity.is(Objects.requireNonNull(getOwner())) || !this.isShotAtAngle())) {
 							float damag = Math.round(sh * Math.sqrt(((5 * freaky.size()) - (direction.length() + ((3.5 * freaky.size()) - 3.5))) / (freaky.size() * (3 - ((freaky.size() - 1.0) / 6)))));
 							livingEntity.hurtServer(serverLevel, damageSources().fireworks((FireworkRocketEntity) serverLevel.getEntity(this.uuid), getOwner()), damag);
 							Ballistics.LOGGER.info(String.valueOf(damag));

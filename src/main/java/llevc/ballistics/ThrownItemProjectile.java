@@ -16,14 +16,19 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.item.component.Fireworks;
+import net.minecraft.world.item.component.UseRemainder;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseTorchBlock;
@@ -96,10 +101,10 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             ItemStack itemStack1 = itemStack.copy();
             Fireworks fireworks = itemStack.getOrDefault(DataComponents.FIREWORKS,new Fireworks(1, List.of()));
             itemStack1.set(DataComponents.FIREWORKS,new Fireworks(-2,fireworks.explosions()));
-            FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(level(), itemStack1, Objects.requireNonNull(getOwner()),position().x,position().y,position().z,false);
-            fireworkRocketEntity.setPos(position());
+            FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(level(),itemStack1,getX(),getY(),getZ(),true);
             fireworkRocketEntity.setOwner(getOwner());
-            Projectile.spawnProjectile(fireworkRocketEntity,((ServerLevel)level()),itemStack);
+            fireworkRocketEntity.shoot(0,0,0,1.6f,0f);
+            Projectile.spawnProjectile(fireworkRocketEntity,((ServerLevel)level()),itemStack1);
             return true;
         }
         return false;
@@ -149,6 +154,22 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         return false;
     }
 
+    private boolean eatIt(LivingEntity player) {
+        ItemStack itemStack = getItem();
+        if (itemStack.has(DataComponents.CONSUMABLE) || itemStack.has(DataComponents.FOOD)) {
+            Consumable consumable = itemStack.getOrDefault(DataComponents.CONSUMABLE,Consumable.builder().build());
+            FoodProperties foodProperties = itemStack.getOrDefault(DataComponents.FOOD,new FoodProperties(0,0,false));
+            UseRemainder useRemainder = itemStack.get(DataComponents.USE_REMAINDER);
+            if (player instanceof Player) foodProperties.onConsume(level(),player,itemStack,consumable);
+            else level().playSound(null,player.blockPosition(),SoundEvents.PLAYER_BURP,player.getSoundSource());
+            consumable.onConsume(level(),player,itemStack);
+            player.hurtServer(((ServerLevel) level()),damageSources().mobProjectile(this, (LivingEntity) getOwner()),1f);
+            if (useRemainder != null) spawnItemEntity(useRemainder.convertInto().create());
+            return true;
+        }
+        return false;
+    }
+
     private void attemptEffect(ItemStack itemStack, Item item, MobEffectInstance mobEffectInstance, List<MobEffectInstance> effectList) {
         if (itemStack.is(item)) effectList.add(mobEffectInstance);
     }
@@ -167,6 +188,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             Entity entity = hitResult.getEntity();
             if (fireworkExplosion()) return;
             if (placeFluid(hitResult.getEntity().blockPosition(),null)) return;
+            if (eatIt(entity.asLivingEntity())) return;
             int damage = 1;
             entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) Math.clamp(Math.ceil(damage * this.getDeltaMovement().length()),0,Integer.MAX_VALUE));
             if (isTorch()) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+60 : 60);
