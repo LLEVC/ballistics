@@ -67,22 +67,18 @@ public class MixedDrinkRecipe extends CustomRecipe {
             }
         }
 
-        Iterable<MobEffectInstance> what = mixer.get(DataComponents.POTION_CONTENTS).getAllEffects();
+        Iterable<MobEffectInstance> what = mixer.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY).getAllEffects();
         List<MobEffectInstance> bbl = new java.util.ArrayList<>(List.of());
-        double level = 0;
         for (MobEffectInstance mobEffectInstance : what) {
             MobEffectInstance newEffect = mobEffectInstance.withScaledDuration((float) 1 / flasks);
             bbl.add(newEffect);
-            level = level+1+mobEffectInstance.getAmplifier();
         }
 
         PotionContents huh = new PotionContents(Optional.of(BuiltInRegistries.POTION.wrapAsHolder(ModItems.MixedPotion)),Optional.empty(),bbl,Optional.empty());
         ItemStack wowwie = new ItemStack(ModItems.Flask);
         wowwie.set(DataComponents.POTION_CONTENTS,huh);
         wowwie.setCount(flasks);
-        if (level > 2*(bbl.size())) {
-            wowwie.set(DataComponents.RARITY, Rarity.RARE);
-        }
+        wowwie.set(DataComponents.RARITY,mixer.getRarity());
         result = wowwie;
 
         return result;

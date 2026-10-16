@@ -1,9 +1,7 @@
 package llevc.ballistics.mixin;
 
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -44,6 +42,7 @@ public abstract class ItemEntityMixin extends Entity {
         if (!exploded) {
             amount = this.getItem().getCount();
         }
+        if (level().isClientSide() && airTime > 10f && !this.onGround()) level().addParticle(ParticleTypes.WAX_ON,getX(),getY(),getZ(),0,0,0);
         if (this.getItem().is(Items.END_CRYSTAL)) {
             if (airTime > 10f && primed && this.onGround()) {
                 DamageSource damageSource2 = this.getOwner() != null ? this.damageSources().explosion(this, this.getOwner()) : null;

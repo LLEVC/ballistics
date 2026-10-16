@@ -1,6 +1,7 @@
 package llevc.ballistics.recipes;
 
 import com.mojang.serialization.MapCodec;
+import llevc.ballistics.Ballistics;
 import llevc.ballistics.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
@@ -73,7 +74,6 @@ public class DrinkMixerRecipe extends CustomRecipe {
 
         List<MobEffectInstance> effects = new java.util.ArrayList<>(List.of());
         List<String> effectsString = new java.util.ArrayList<>(List.of());
-        double level = 0;
         for (PotionContents potionContents : mhm) {
             for (MobEffectInstance sup : potionContents.getAllEffects()) {
                 if (effectsString.contains(sup.getEffect().getRegisteredName())) {
@@ -92,12 +92,12 @@ public class DrinkMixerRecipe extends CustomRecipe {
                     effects.add(sup.withScaledDuration(1.0f));
                     effectsString.add(sup.getEffect().getRegisteredName());
                 }
-                level = level+1+sup.getAmplifier();
             }
         }
 
         PotionContents what = new PotionContents(Optional.empty(),Optional.empty(),effects,Optional.empty());
         ItemStack wowwie = new ItemStack(ModItems.DrinkMixer);
+        double level = ModItems.checkPotionLevel(mhm);
         if (level > 2*(effectsString.size())) {
             wowwie.set(DataComponents.RARITY, Rarity.RARE);
         }

@@ -10,17 +10,25 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.predicates.EnchantmentsPredicate;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -74,7 +82,12 @@ public abstract class FireworkMixin extends Projectile implements ItemSupplier {
 				//Ballistics.LOGGER.info(String.valueOf(damag));
 				owner.hurtServer(world,damageSources().fireworks((FireworkRocketEntity) world.getEntity(this.uuid),owner), (float) damag);
 				owner.resetFallDistance();
-				owner.setDeltaMovement(yo);
+				//owner.setDeltaMovement(yo);
+				owner.push(yo);
+				if (owner instanceof ServerPlayer serverPlayer) {
+					ClientboundExplodePacket clientboundExplodePacket = new ClientboundExplodePacket(this.position(),(float)direction.length(),0,Optional.of(yo), ParticleTypes.FIREWORK, Holder.direct(SoundEvents.EMPTY), WeightedList.of(), false);
+					serverPlayer.connection.send(clientboundExplodePacket);
+				}
 			}
 		}
 	}

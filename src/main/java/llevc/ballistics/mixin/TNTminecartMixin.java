@@ -33,4 +33,9 @@ public abstract class TNTminecartMixin extends AbstractMinecart {
         }
         return original.call(level,source,damage);
     }
+
+    @WrapMethod(method = "causeFallDamage")
+    public boolean wsg(double fallDistance, float damageModifier, DamageSource damageSource, Operation<Boolean> original) {
+        return original.call(fallDistance/2,damageModifier,damageSource);
+    }
 }

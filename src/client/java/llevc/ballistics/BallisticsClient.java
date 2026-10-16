@@ -1,5 +1,6 @@
 package llevc.ballistics;
 
+import llevc.ballistics.networking.ClientboundJumpPacket;
 import llevc.ballistics.networking.ServerboundChargePacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -44,6 +45,10 @@ public class BallisticsClient implements ClientModInitializer {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRenderers.register(ModEntities.flintlockProjectile, ThrownItemRenderer::new);
 		EntityRenderers.register(ModEntities.thrownItemProjectile, ThrownItemEntityRenderer::new);
+
+		ClientPlayNetworking.registerGlobalReceiver(ClientboundJumpPacket.TYPE, (packet, context) -> {
+			context.player().push(packet.vec3());
+		});
 
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
 			if (client.player == null || client.gameMode == null) return;

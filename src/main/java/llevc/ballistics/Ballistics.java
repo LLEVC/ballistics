@@ -1,5 +1,6 @@
 package llevc.ballistics;
 
+import llevc.ballistics.networking.ClientboundJumpPacket;
 import llevc.ballistics.networking.ServerboundChargePacket;
 import llevc.ballistics.recipes.*;
 import net.fabricmc.api.ModInitializer;
@@ -37,6 +38,7 @@ public class Ballistics implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath("ballistics","crafting_special_flintlock_load"), FlintlockLoadRecipe.SERIALIZER);
 
 		PayloadTypeRegistry.serverboundPlay().register(ServerboundChargePacket.TYPE,ServerboundChargePacket.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(ClientboundJumpPacket.TYPE,ClientboundJumpPacket.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(ServerboundChargePacket.TYPE, (payload, context) -> {
 			if (payload.integer() == 0) {

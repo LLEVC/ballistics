@@ -3,6 +3,7 @@
   "package": "llevc.ballistics.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "BoatItemMixin",
     "BottleItemMixin",
     "BrewingRecipeMixin",
     "FireworkItemMixin",
@@ -11,6 +12,7 @@
     "ItemDropMomentumMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
+    "MinecartItemMixin",
     "PlayerMixin",
     "PotionMixin",
     "ProjectileMixin",

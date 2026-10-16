@@ -3,10 +3,12 @@ package llevc.ballistics.mixin;
 import llevc.ballistics.*;
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
@@ -15,10 +17,13 @@ import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseTorchBlock;
+import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -57,30 +62,20 @@ public abstract class ItemDropMomentumMixin {
             Vec3 newVelo = itemEntity.getDeltaMovement();
             if (turnToProjectile) {
                 if (bih.level() instanceof ServerLevel serverLevel) {
-                    boolean isFirework = itemStack.getItem() instanceof FireworkRocketItem;
-                    if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!isFirework || bih.isHolding(ModItems.rhGlove))) {
-                        Vec3 viewVector = bih.getViewVector(1.0f);
-                        //Ballistics.LOGGER.info(String.valueOf(viewVector));
-                        Projectile projectile = projectileItem.asProjectile(serverLevel,itemEntity.position().add(viewVector),itemStack, Direction.NORTH);
-                        projectile.setOwner(bih);
-                        projectile.shootFromRotation(bih,bih.getXRot(),bih.getYRot(),0f,1.5f,1f);
-                        Projectile.spawnProjectile(projectile,serverLevel,itemStack);
-                    } else if (itemStack.getItem() instanceof TridentItem) {
-                        ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
-                        Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
-                    } else {
-                        ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile, bih, bih.level(), itemStack);
-                        //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
-                        thrownItemProjectile.setDeltaMovement(newVelo);
-                        thrownItemProjectile.setPos(itemEntity.position());
-                        Projectile.spawnProjectile(thrownItemProjectile, serverLevel, itemStack);
-                        //bih.level().addFreshEntity(thrownItemProjectile);
-                    }
+                    ThrownItemProjectile.giveCorrectProjectile(itemStack,serverLevel,bih,itemEntity.position(),newVelo,true);
                 }
                 itemEntity = null;
             }
             //Ballistics.LOGGER.info(String.valueOf(deltaata));
             cir.setReturnValue(itemEntity);
         }
+    }
+
+    @Unique
+    private boolean isFallingBlock(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof BlockItem blockItem) {
+            return blockItem.getBlock() instanceof FallingBlock;
+        }
+        return false;
     }
 }

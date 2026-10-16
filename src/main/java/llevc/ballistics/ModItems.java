@@ -115,6 +115,18 @@ public class ModItems {
             new Potion("mixed")
     );
 
+    public static int checkPotionLevel(List<PotionContents> potionContentsList) {
+        int level = 0;
+        for (PotionContents potionContents : potionContentsList) for (MobEffectInstance mobEffectInstance : potionContents.getAllEffects()) level = level+mobEffectInstance.getAmplifier()+1;
+        return level;
+    }
+
+    public static int checkPotionLevel(PotionContents potionContents) {
+        int level = 0;
+        for (MobEffectInstance mobEffectInstance : potionContents.getAllEffects()) level = level+mobEffectInstance.getAmplifier()+1;
+        return level;
+    }
+
     public static final ResourceKey<CreativeModeTab> BallisticsItemGroupKey = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(Ballistics.MOD_ID, "ballistics"));
     public static final CreativeModeTab BallisticsItemGroup = FabricCreativeModeTab.builder().icon(() -> new ItemStack(Items.FIREWORK_ROCKET)).displayItems((params, output) -> {
         output.accept(rhGlove);

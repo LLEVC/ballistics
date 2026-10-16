@@ -10,7 +10,10 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -21,20 +24,17 @@ import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.component.Consumable;
-import net.minecraft.world.item.component.FireworkExplosion;
-import net.minecraft.world.item.component.Fireworks;
-import net.minecraft.world.item.component.UseRemainder;
+import net.minecraft.world.item.component.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseTorchBlock;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.TorchBlock;
-import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -42,6 +42,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,6 +61,47 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, LivingEntity owner, Level level, ItemStack itemStack) {
         super(type, owner, level, itemStack);
         this.bobOffs = this.random.nextFloat() * (float)Math.PI * 2.0F;
+    }
+
+    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView) {
+        return giveCorrectProjectile(itemStack,serverLevel,bih,position,newVelo,addView,false);
+    }
+
+    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView, boolean projectileVeloBased) {
+        boolean isFirework = itemStack.getItem() instanceof FireworkRocketItem;
+        Entity yuh;
+        if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!isFirework || bih.isHolding(ModItems.rhGlove))) {
+            Vec3 viewVector = bih.getViewVector(1.0f);
+            //Ballistics.LOGGER.info(String.valueOf(viewVector));
+            Projectile projectile = projectileItem.asProjectile(serverLevel, addView ? position.add(viewVector) : position,itemStack, Direction.NORTH);
+            projectile.setOwner(bih);
+            if (projectileVeloBased) {
+                projectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.5f,1f);
+            } else {
+                projectile.shootFromRotation(bih, bih.getXRot(), bih.getYRot(), 0f, 1.5f, 1f);
+            }
+            yuh = Projectile.spawnProjectile(projectile,serverLevel,itemStack);
+        } else if (itemStack.getItem() instanceof TridentItem) {
+            ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
+            yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
+        } else if (itemStack.getItem() instanceof EntitySpawnItemInterface entitySpawnItemInterface) {
+            EntityType<?> type = entitySpawnItemInterface.ballistics$getSpawnEntity();
+            Entity entity = type.create(serverLevel, EntitySpawnReason.EVENT);
+            yuh = entity;
+            if (entity != null) {
+                entity.setPos(position);
+                entity.setDeltaMovement(newVelo);
+                serverLevel.addFreshEntity(entity);
+            }
+        } else {
+            ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile, bih, bih.level(), itemStack);
+            //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
+            thrownItemProjectile.setDeltaMovement(newVelo);
+            thrownItemProjectile.setPos(position);
+            yuh = Projectile.spawnProjectile(thrownItemProjectile, serverLevel, itemStack);
+            //bih.level().addFreshEntity(thrownItemProjectile);
+        }
+        return yuh;
     }
 
     protected Item getDefaultItem() {
@@ -170,12 +212,116 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         return false;
     }
 
+    private boolean colorTheWorld(BlockState block, BlockPos pos) {
+        ItemStack itemStack = getItem();
+        if (itemStack.has(DataComponents.DYE)) {
+            DyeColor dyeColor = itemStack.getOrDefault(DataComponents.DYE, DyeColor.WHITE);
+            // TERRACOTTA
+            if (block.is(BlockTags.TERRACOTTA)) {
+                level().setBlockAndUpdate(pos, ((Block) getColorOfBlock(Blocks.DYED_TERRACOTTA, dyeColor)).defaultBlockState());
+            } else if (block.is(BlockTags.GLAZED_TERRACOTTA)) {
+                level().setBlockAndUpdate(pos,copyWithColor(block,Blocks.GLAZED_TERRACOTTA,dyeColor));
+            }
+            // WOOL
+            else if (block.is(BlockTags.WOOL)) {
+                level().setBlockAndUpdate(pos,((Block)getColorOfBlock(Blocks.WOOL,dyeColor)).defaultBlockState());
+            } else if (block.is(BlockTags.WOOL_CARPETS)) {
+                level().setBlockAndUpdate(pos,copyWithColor(block,Blocks.CARPET,dyeColor));
+            } else if (block.is(BlockTags.WOOL_SLABS)) {
+                level().setBlockAndUpdate(pos,copyWithColor(block,Blocks.WOOL_SLAB,dyeColor));
+            } else if (block.is(BlockTags.WOOL_STAIRS)) {
+                level().setBlockAndUpdate(pos,copyWithColor(block,Blocks.WOOL_STAIRS,dyeColor));
+            }
+            // CONCRETE
+            else if (block.is(BlockTags.CONCRETE)) {
+                level().setBlockAndUpdate(pos,((Block)getColorOfBlock(Blocks.CONCRETE,dyeColor)).defaultBlockState());
+            } else if (block.is(BlockTags.CONCRETE_POWDERS)) {
+                level().setBlockAndUpdate(pos,((Block)getColorOfBlock(Blocks.CONCRETE_POWDER,dyeColor)).defaultBlockState());
+            } else if (block.is(BlockTags.CONCRETE_SLABS)) {
+                level().setBlockAndUpdate(pos,copyWithColor(block,Blocks.CONCRETE_SLAB,dyeColor));
+            } else if (block.is(BlockTags.CONCRETE_STAIRS)) {
+                level().setBlockAndUpdate(pos,copyWithColor(block,Blocks.CONCRETE_STAIRS,dyeColor));
+            }
+            //
+            return true;
+        }
+        return false;
+    }
+
+    private boolean bricked(Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.is(Items.BRICKS) || itemStack.is(Items.NETHER_BRICKS)) {
+            Item brick = itemStack.is(Items.NETHER_BRICKS) ? Items.NETHER_BRICK : Items.BRICK;
+            for (int i = 0; i < 4; i++) {
+                ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile,getOwner() != null ? getOwner().asLivingEntity() : null,level(),new ItemStack(brick));
+                thrownItemProjectile.setPos(position().add(0,0.125,0).add(direction.getUnitVec3()));
+                thrownItemProjectile.setDeltaMovement(new Vec3(random.nextIntBetweenInclusive(-8,8),random.nextIntBetweenInclusive(0,16)*(direction == Direction.DOWN ? -1 : 1),random.nextIntBetweenInclusive(-8,8)).add(direction.getUnitVec3().multiply(4,2,4)).multiply(0.05,0.05,0.05));
+                Projectile.spawnProjectile(thrownItemProjectile,(ServerLevel) level(), new ItemStack(brick));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean bundled(Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.is(ItemTags.BUNDLES)) {
+            BundleContents bundleContents = itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS,BundleContents.EMPTY);
+            for (ItemStackTemplate itemStackTemplate : bundleContents.items()) {
+                ItemStack itemStack1 = itemStackTemplate.create();
+                for (int i = 0; i < itemStack1.count(); i++) {
+                    Vec3 velo = new Vec3(random.nextIntBetweenInclusive(-8,8),random.nextIntBetweenInclusive(0,16)*(direction == Direction.DOWN ? -1 : 1),random.nextIntBetweenInclusive(-8,8)).add(direction.getUnitVec3().multiply(4,2,4)).multiply(0.05,0.05,0.05);
+                    Entity thrownItemProjectile = giveCorrectProjectile(
+                            itemStack1.copyWithCount(1),
+                            ((ServerLevel)level()),
+                            Objects.requireNonNull(getOwner()).asLivingEntity(),
+                            position().add(0,0.125,0).add(direction.getUnitVec3()),
+                            velo,
+                            false,
+                            true
+                    );
+                }
+            }
+            ItemStack itemStack1 = itemStack.copy();
+            itemStack1.set(DataComponents.BUNDLE_CONTENTS,BundleContents.EMPTY);
+            spawnItemEntity(itemStack1);
+            return true;
+        }
+        return false;
+    }
+
+    private BlockState copyWithColor(BlockState blockState, ColorCollection<Block> block, DyeColor dyeColor) {
+        return ((Block)getColorOfBlock(block,dyeColor)).defaultBlockState().withPropertiesOf(blockState);
+    }
+
+    private Object getColorOfBlock(ColorCollection<?> colorCollection, DyeColor dyeColor) {
+        switch (dyeColor) {
+            case RED -> {return colorCollection.red();}
+            case BLUE -> {return colorCollection.blue();}
+            case CYAN -> {return colorCollection.cyan();}
+            case GRAY -> {return colorCollection.gray();}
+            case LIME -> {return colorCollection.lime();}
+            case PINK -> {return colorCollection.pink();}
+            case BLACK -> {return colorCollection.black();}
+            case BROWN -> {return colorCollection.brown();}
+            case GREEN -> {return colorCollection.green();}
+            case WHITE -> {return colorCollection.white();}
+            case ORANGE -> {return colorCollection.orange();}
+            case PURPLE -> {return colorCollection.purple();}
+            case YELLOW -> {return colorCollection.yellow();}
+            case MAGENTA -> {return colorCollection.magenta();}
+            case LIGHT_BLUE -> {return colorCollection.lightBlue();}
+            case LIGHT_GRAY -> {return colorCollection.lightGray();}
+        }
+        return colorCollection.white();
+    }
+
     private void attemptEffect(ItemStack itemStack, Item item, MobEffectInstance mobEffectInstance, List<MobEffectInstance> effectList) {
         if (itemStack.is(item)) effectList.add(mobEffectInstance);
     }
 
     private List<MobEffectInstance> processPotions(ItemStack itemStack) {
-        List<MobEffectInstance> effectList = new java.util.ArrayList<>(List.of());
+        List<MobEffectInstance> effectList = new ArrayList<>(List.of());
         attemptEffect(itemStack,Items.SLIME_BLOCK,new MobEffectInstance(MobEffects.OOZING,20*20),effectList);
         attemptEffect(itemStack,Items.SLIME_BALL,new MobEffectInstance(MobEffects.OOZING,60*20),effectList);
         attemptEffect(itemStack,Items.WITHER_ROSE,new MobEffectInstance(MobEffects.WITHER,3*20),effectList);
@@ -190,14 +336,18 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (placeFluid(hitResult.getEntity().blockPosition(),null)) return;
             if (eatIt(entity.asLivingEntity())) return;
             int damage = 1;
+            if (itemStack.is(Items.BRICK) || itemStack.is(Items.NETHER_BRICK)) damage += 3;
             entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) Math.clamp(Math.ceil(damage * this.getDeltaMovement().length()),0,Integer.MAX_VALUE));
             if (isTorch()) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+60 : 60);
+            if (itemStack.is(Items.NETHER_BRICK)) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+20 : 20);
             if (entity instanceof LivingEntity livingEntity) {
                 List<MobEffectInstance> effectList = processPotions(itemStack);
                 for (MobEffectInstance mobEffectInstance : effectList) {
                     livingEntity.addEffect(mobEffectInstance);
                 }
             }
+            if (bricked(Direction.getApproximateNearest(getDeltaMovement()))) return;
+            if (bundled(Direction.getApproximateNearest(getDeltaMovement()))) return;
             spawnItemEntity();
         }
     }
@@ -208,6 +358,21 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (fireworkExplosion()) return;
             if (placeFluid(hitResult.getBlockPos(),hitResult.getDirection())) return;
             if (placeTorch(hitResult.getBlockPos(),hitResult.getDirection())) return;
+            if (colorTheWorld(level().getBlockState(hitResult.getBlockPos()),hitResult.getBlockPos())) {
+                for (int a = 0; a < 3; a++) {
+                    for (int b = 0; b < 3; b++) {
+                        for (int c = 0; c < 3; c++) {
+                            BlockPos off = hitResult.getBlockPos().offset(1-a,1-b,1-c);
+                            Ballistics.LOGGER.info(String.valueOf(off));
+                            if (off != hitResult.getBlockPos()) colorTheWorld(level().getBlockState(off),off);
+                        }
+                    }
+                }
+                level().playSound(null,hitResult.getBlockPos(),SoundEvents.ITEM_PICKUP,getOwner() == null ? SoundSource.HOSTILE : getOwner().getSoundSource(),0.5f,2.0f);
+                return;
+            }
+            if (bricked(hitResult.getDirection())) return;
+            if (bundled(hitResult.getDirection())) return;
             spawnItemEntity();
         }
     }

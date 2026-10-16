@@ -90,10 +90,8 @@ public class FlaskRecipe extends CustomRecipe {
 
         if (!potion.isEmpty() && flask && !overflow) {
             PotionContents death = Objects.requireNonNull(potion.get(DataComponents.POTION_CONTENTS));
-            double level = 0;
             List<String> effects = new java.util.ArrayList<>(List.of());
             for (MobEffectInstance mobEffectInstance : death.getAllEffects()) {
-                level = level+mobEffectInstance.getAmplifier()+1;
                 if (!effects.contains(mobEffectInstance.getEffect().getRegisteredName())) {
                     effects.add(mobEffectInstance.getEffect().getRegisteredName());
                 }
@@ -106,9 +104,7 @@ public class FlaskRecipe extends CustomRecipe {
                 gamer = PotionContents.createItemStack(ModItems.Flask, death.potion().orElse(Potions.WATER));
             }
             gamer.set(DataComponents.POTION_CONTENTS, death);
-            if (level > 2*(effects.size())) {
-                gamer.set(DataComponents.RARITY,Rarity.RARE);
-            }
+            gamer.set(DataComponents.RARITY,gamer.getRarity());
             result = gamer;
         }
 
