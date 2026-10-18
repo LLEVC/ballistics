@@ -1,5 +1,6 @@
 package llevc.ballistics;
 
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -18,6 +19,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
@@ -31,10 +33,12 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -64,13 +68,13 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     }
 
     public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView) {
-        return giveCorrectProjectile(itemStack,serverLevel,bih,position,newVelo,addView,false);
+        return giveCorrectProjectile(itemStack,serverLevel,bih,position,newVelo,addView,false,bih.isHolding(ModItems.rhGlove));
     }
 
-    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView, boolean projectileVeloBased) {
+    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView, boolean projectileVeloBased, boolean igniteFirework) {
         boolean isFirework = itemStack.getItem() instanceof FireworkRocketItem;
         Entity yuh;
-        if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!isFirework || bih.isHolding(ModItems.rhGlove))) {
+        if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!isFirework || igniteFirework)) {
             Vec3 viewVector = bih.getViewVector(1.0f);
             //Ballistics.LOGGER.info(String.valueOf(viewVector));
             Projectile projectile = projectileItem.asProjectile(serverLevel, addView ? position.add(viewVector) : position,itemStack, Direction.NORTH);
@@ -83,7 +87,14 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             yuh = Projectile.spawnProjectile(projectile,serverLevel,itemStack);
         } else if (itemStack.getItem() instanceof TridentItem) {
             ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
-            yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
+            if (projectileVeloBased) {
+                yuh = Projectile.spawnProjectile(((ProjectileFactory<ThrownTrident>) ThrownTrident::new).create(serverLevel, bih, returnItemStack), serverLevel, returnItemStack, (trident) -> {
+                    trident.shoot(newVelo.x, newVelo.y, newVelo.z, 2.5f, 1f);
+                    trident.setPos(position);
+                });
+            } else {
+                yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
+            }
         } else if (itemStack.getItem() instanceof EntitySpawnItemInterface entitySpawnItemInterface) {
             EntityType<?> type = entitySpawnItemInterface.ballistics$getSpawnEntity();
             Entity entity = type.create(serverLevel, EntitySpawnReason.EVENT);
@@ -267,10 +278,25 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         ItemStack itemStack = getItem();
         if (itemStack.is(ItemTags.BUNDLES)) {
             BundleContents bundleContents = itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS,BundleContents.EMPTY);
+            List<ItemStackTemplate> list = new ArrayList<>(List.of());
+            boolean hasIgnition = false;
             for (ItemStackTemplate itemStackTemplate : bundleContents.items()) {
+                if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() <= 1) hasIgnition = true;
+                else if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() > 1) {
+                    hasIgnition = true;
+                    list.add(itemStackTemplate.withCount(itemStackTemplate.count()-1));
+                } else {
+                    list.add(itemStackTemplate);
+                }
+            }
+            for (ItemStackTemplate itemStackTemplate : list) {
                 ItemStack itemStack1 = itemStackTemplate.create();
                 for (int i = 0; i < itemStack1.count(); i++) {
-                    Vec3 velo = new Vec3(random.nextIntBetweenInclusive(-8,8),random.nextIntBetweenInclusive(0,16)*(direction == Direction.DOWN ? -1 : 1),random.nextIntBetweenInclusive(-8,8)).add(direction.getUnitVec3().multiply(4,2,4)).multiply(0.05,0.05,0.05);
+                    Vec3 velo = new Vec3(
+                            random.nextIntBetweenInclusive(-8,8),
+                            random.nextIntBetweenInclusive(-8,8),
+                            random.nextIntBetweenInclusive(-8,8)
+                    ).add(direction.getUnitVec3().multiply(8,8,8)).multiply(0.05,0.05,0.05);
                     Entity thrownItemProjectile = giveCorrectProjectile(
                             itemStack1.copyWithCount(1),
                             ((ServerLevel)level()),
@@ -278,7 +304,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                             position().add(0,0.125,0).add(direction.getUnitVec3()),
                             velo,
                             false,
-                            true
+                            true,
+                            hasIgnition
                     );
                 }
             }
@@ -286,6 +313,68 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             itemStack1.set(DataComponents.BUNDLE_CONTENTS,BundleContents.EMPTY);
             spawnItemEntity(itemStack1);
             return true;
+        }
+        return false;
+    }
+
+    private boolean armorStand(BlockPos pos, Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.is(Items.ARMOR_STAND)) {
+            ArmorStand armorStand = new ArmorStand(level(),pos.getX(),pos.getY(),pos.getZ());
+            BlockPos pos1 = pos.offset(direction.getStep());
+            armorStand.setPos(new Vec3(pos1.getX(),pos1.getY(),pos1.getZ()).add(0.5,0,0.5));
+            level().addFreshEntity(armorStand);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean spawnEgg(BlockPos pos, Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.getItem() instanceof SpawnEggItem spawnEggItem && itemStack.has(DataComponents.ENTITY_DATA)) {
+            TypedEntityData<EntityType<?>> entityData = itemStack.get(DataComponents.ENTITY_DATA);
+            BlockPos pos1 = pos.offset(direction.getStep());
+            entityData.type().spawn(((ServerLevel) level()),itemStack,getOwner() != null ? getOwner().asLivingEntity() : null,pos1
+                    ,EntitySpawnReason.SPAWN_ITEM_USE,true,direction == Direction.UP);
+            level().gameEvent(getOwner(), GameEvent.ENTITY_PLACE, pos1);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean chargedProjectileShoot(Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.has(DataComponents.CHARGED_PROJECTILES) && itemStack.getItem() instanceof CrossbowItem crossbowItem) {
+            ItemStack itemStack1 = itemStack.copy();
+            ChargedProjectiles chargedProjectiles = itemStack.getOrDefault(DataComponents.CHARGED_PROJECTILES,ChargedProjectiles.EMPTY);
+            List<ItemStack> load = chargedProjectiles.itemCopies().toList();
+
+            for (ItemStack projectile : load) {
+                if (!projectile.isEmpty() && projectile.getItem() instanceof ProjectileItem projectileItem) {
+                    Vec3i newVelo = direction.getStep();
+                    Projectile projectile1 = projectileItem.asProjectile(level(), position().add(newVelo.getX(),newVelo.getY(),newVelo.getZ()), projectile, Direction.NORTH);
+                    projectile1.setOwner(getOwner());
+                    projectile1.shoot(newVelo.getX(), newVelo.getY(), newVelo.getZ(), 1.5f, 20f);
+                    itemStack1.hurtAndBreak(1,getOwner().asLivingEntity(),EquipmentSlot.MAINHAND);
+                    Projectile.spawnProjectile(projectile1, (ServerLevel) level(),projectile);
+                }
+            }
+            itemStack1.remove(DataComponents.CHARGED_PROJECTILES);
+            spawnItemEntity(itemStack1);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean bucketPickup(BlockState block, BlockPos pos) {
+        ItemStack itemStack = getItem();
+        if (itemStack.is(Items.BUCKET)) {
+            Block block1 = block.getBlock();
+            if (block1 instanceof BucketPickup bucketPickup) {
+                if (bucketPickup.getPickupSound().isPresent()) level().playSound(null,pos,bucketPickup.getPickupSound().get(),SoundSource.BLOCKS);
+                spawnItemEntity(bucketPickup.pickupBlock(getOwner() != null ? getOwner().asLivingEntity() : null, level(), pos, block));
+                return true;
+            }
         }
         return false;
     }
@@ -348,6 +437,9 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             }
             if (bricked(Direction.getApproximateNearest(getDeltaMovement()))) return;
             if (bundled(Direction.getApproximateNearest(getDeltaMovement()))) return;
+            if (armorStand(entity.blockPosition(),Direction.UP)) return;
+            if (spawnEgg(entity.blockPosition(),Direction.UP)) return;
+            if (getOwner() != null && chargedProjectileShoot(Direction.getApproximateNearest(getDeltaMovement()))) return;
             spawnItemEntity();
         }
     }
@@ -373,6 +465,9 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             }
             if (bricked(hitResult.getDirection())) return;
             if (bundled(hitResult.getDirection())) return;
+            if (armorStand(hitResult.getBlockPos(),hitResult.getDirection())) return;
+            if (spawnEgg(hitResult.getBlockPos(),hitResult.getDirection())) return;
+            if (getOwner() != null && chargedProjectileShoot(hitResult.getDirection())) return;
             spawnItemEntity();
         }
     }
@@ -383,6 +478,10 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         if (!level().isClientSide()) this.kill((ServerLevel) level());
     }
 
+    protected void whenInsideBucketable() {
+        if (bucketPickup(level().getBlockState(blockPosition()),blockPosition())) if (!level().isClientSide()) this.kill((ServerLevel) level());
+    }
+
     protected double getDefaultGravity() {
         return 0.04;
     }
@@ -390,6 +489,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     @Override
     public void tick() {
         //((ThrowableProjectileInvoker) this).handleFirstTickBubbleColumn();
+        if ((this.isInLava() || this.isInWater() || this.isInPowderSnow) && getItem().is(Items.BUCKET)) whenInsideBucketable();
+
         if (this.isInWater() && this.getFluidHeight(FluidTags.WATER) > (double)0.1F) {
             this.setUnderwaterMovement();
         } else if (this.isInLava() && this.getFluidHeight(FluidTags.LAVA) > (double)0.1F) {

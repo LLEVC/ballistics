@@ -41,6 +41,7 @@ public class ModItems {
     }
 
     public static final TagKey<Item> projectileThrowBlacklist = TagKey.create(Registries.ITEM,Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,"projectile_throw_blacklist"));
+    public static final TagKey<Item> ignitesFireworksInBundles = TagKey.create(Registries.ITEM,Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,"ignites_fireworks_in_bundles"));
 
     public static final Item EmptyFlask = register(
             "empty_flask",
