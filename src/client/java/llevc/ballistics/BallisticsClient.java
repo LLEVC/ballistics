@@ -45,6 +45,7 @@ public class BallisticsClient implements ClientModInitializer {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRenderers.register(ModEntities.flintlockProjectile, ThrownItemRenderer::new);
 		EntityRenderers.register(ModEntities.thrownItemProjectile, ThrownItemEntityRenderer::new);
+		EntityRenderers.register(ModEntities.thrownWeaponProjectile, ThrownWeaponEntityRenderer::new);
 
 		ClientPlayNetworking.registerGlobalReceiver(ClientboundJumpPacket.TYPE, (packet, context) -> {
 			context.player().push(packet.vec3());

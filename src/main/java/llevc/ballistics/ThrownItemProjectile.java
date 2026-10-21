@@ -52,19 +52,36 @@ import java.util.Objects;
 
 public class ThrownItemProjectile extends ThrowableItemProjectile {
     public final float bobOffs;
+    public final boolean directional;
+
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, Level level) {
+        this(type,level,true);
+    }
+
+    public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, Level level, boolean directional1) {
         super(type, level);
         this.bobOffs = this.random.nextFloat() * (float)Math.PI * 2.0F;
+        this.directional = directional1;
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, double x, double y, double z, Level level, ItemStack itemStack) {
+        this(type,x,y,z,level,itemStack,true);
+    }
+
+    public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, double x, double y, double z, Level level, ItemStack itemStack, boolean directional1) {
         super(type, x, y, z, level, itemStack);
         this.bobOffs = this.random.nextFloat() * (float)Math.PI * 2.0F;
+        this.directional = directional1;
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, LivingEntity owner, Level level, ItemStack itemStack) {
+        this(type,owner,level,itemStack,true);
+    }
+
+    public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, LivingEntity owner, Level level, ItemStack itemStack, boolean directional1) {
         super(type, owner, level, itemStack);
         this.bobOffs = this.random.nextFloat() * (float)Math.PI * 2.0F;
+        this.directional = directional1;
     }
 
     public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView) {
@@ -104,6 +121,24 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 entity.setDeltaMovement(newVelo);
                 serverLevel.addFreshEntity(entity);
             }
+        } else if (itemStack.has(DataComponents.WEAPON)) {
+            //ThrownWeaponProjectile thrownItemProjectile = new ThrownWeaponProjectile(bih, bih.level(), itemStack, null);
+            //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
+            //thrownItemProjectile.setDeltaMovement(newVelo);
+            //thrownItemProjectile.setPos(position);
+            //yuh = Projectile.spawnProjectile(thrownItemProjectile, serverLevel, itemStack);
+            //bih.level().addFreshEntity(thrownItemProjectile);
+
+            ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
+            if (projectileVeloBased) {
+                yuh = Projectile.spawnProjectile(((ProjectileFactory<ThrownWeaponProjectile>) ThrownWeaponProjectile::new).create(serverLevel,bih,itemStack), serverLevel, returnItemStack, (trident) -> {
+                    trident.shoot(newVelo.x, newVelo.y, newVelo.z, 2.5f, 1f);
+                    trident.setPos(position);
+                });
+            } else {
+                yuh = Projectile.spawnProjectileFromRotation(ThrownWeaponProjectile::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
+            }
+
         } else {
             ThrownItemProjectile thrownItemProjectile = new ThrownItemProjectile(ModEntities.thrownItemProjectile, bih, bih.level(), itemStack);
             //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
@@ -117,6 +152,14 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
 
     protected Item getDefaultItem() {
         return Items.ITEM_FRAME;
+    }
+
+    public Vec3 getModelRotationOffset() {
+        return new Vec3(0,0,0);
+    }
+
+    public Vec3 getModelPositionOffset() {
+        return new Vec3(0,0,0);
     }
 
     public void handleEntityEvent(final @EntityEvent.Value byte id) {
@@ -489,23 +532,22 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     @Override
     public void tick() {
         //((ThrowableProjectileInvoker) this).handleFirstTickBubbleColumn();
-        if ((this.isInLava() || this.isInWater() || this.isInPowderSnow) && getItem().is(Items.BUCKET)) whenInsideBucketable();
+        if ((this.isInLava() || this.isInWater() || this.isInPowderSnow) && getItem().is(Items.BUCKET))
+            whenInsideBucketable();
 
-        if (this.isInWater() && this.getFluidHeight(FluidTags.WATER) > (double)0.1F) {
+        if (this.isInWater() && this.getFluidHeight(FluidTags.WATER) > (double)0.1F)
             this.setUnderwaterMovement();
-        } else if (this.isInLava() && this.getFluidHeight(FluidTags.LAVA) > (double)0.1F) {
+        else if (this.isInLava() && this.getFluidHeight(FluidTags.LAVA) > (double)0.1F)
             this.setUnderLavaMovement();
-        } else {
+        else
             this.applyGravity();
-        }
 
-        if (this.level().isClientSide()) {
+        if (this.level().isClientSide())
             this.noPhysics = false;
-        } else {
+        else {
             this.noPhysics = !this.level().noCollision(this, this.getBoundingBox().deflate(1.0E-7));
-            if (this.noPhysics) {
+            if (this.noPhysics)
                 this.moveTowardsClosestSpace(this.getX(), (this.getBoundingBox().minY + this.getBoundingBox().maxY) / (double)2.0F, this.getZ());
-            }
         }
 
         //((ThrowableProjectileInvoker) this).applyInertia();
@@ -535,7 +577,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         }
 
         //this.setPos(newPosition);
-        //this.updateRotation();
+        if (directional) this.updateRotation();
         //this.applyEffectsFromBlocks();
 
         //super.tick();

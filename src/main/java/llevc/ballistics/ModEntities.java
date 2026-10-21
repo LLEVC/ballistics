@@ -20,14 +20,21 @@ public class ModEntities implements ModInitializer {
     public static final EntityType<FlintlockProjectile> flintlockProjectile = register(
             flintlockProjectileKey,
             EntityType.Builder.<FlintlockProjectile>of(FlintlockProjectile::new,MobCategory.MISC)
-            .sized(0.25f, 0.25f).clientTrackingRange(4).updateInterval(10)
+            .sized(0.25f, 0.25f).clientTrackingRange(4).updateInterval(10).noLootTable()
     );
 
     public static final ResourceKey<EntityType<?>> thrownItemProjectileKey = ResourceKey.create(Registries.ENTITY_TYPE,Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,"thrown_item"));
     public static final EntityType<ThrownItemProjectile> thrownItemProjectile = register(
             thrownItemProjectileKey,
             EntityType.Builder.<ThrownItemProjectile>of(ThrownItemProjectile::new,MobCategory.MISC)
-                    .sized(0.25f, 0.25f).clientTrackingRange(4).updateInterval(10)
+                    .sized(0.25f, 0.25f).clientTrackingRange(4).updateInterval(10).noLootTable()
+    );
+
+    public static final ResourceKey<EntityType<?>> thrownWeaponProjectileKey = ResourceKey.create(Registries.ENTITY_TYPE,Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,"thrown_weapon"));
+    public static final EntityType<ThrownWeaponProjectile> thrownWeaponProjectile = register(
+            thrownWeaponProjectileKey,
+            EntityType.Builder.<ThrownWeaponProjectile>of(ThrownWeaponProjectile::new,MobCategory.MISC)
+                    .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).eyeHeight(0.13f).noLootTable()
     );
 
     @Override
