@@ -13,6 +13,10 @@ public class ModEnchantmentEffects {
     public static final DataComponentType<EnchantmentValueEffect> disableBlocking = register("disable_blocking",(b) -> b.persistent(EnchantmentValueEffect.CODEC));
     public static final DataComponentType<Unit> quickload = register("quickload",(b) -> b.persistent(Unit.CODEC));
     public static final DataComponentType<Unit> flintlockRaycast = register("flintlock_raycast",(b) -> b.persistent(Unit.CODEC));
+    public static final DataComponentType<EnchantmentValueEffect> throwCooldown = register("throw_cooldown",(b) -> b.persistent(EnchantmentValueEffect.CODEC));
+    public static final DataComponentType<EnchantmentValueEffect> throwPower = register("throw_power",(b) -> b.persistent(EnchantmentValueEffect.CODEC));
+    public static final DataComponentType<EnchantmentValueEffect> overchargeThrows = register("overcharge_throws",(b) -> b.persistent(EnchantmentValueEffect.CODEC));
+    public static final DataComponentType<Unit> overchargeAsPower = register("overcharge_as_power",(b) -> b.persistent(Unit.CODEC));
 
     public static <T> DataComponentType<T> register(final String id, final UnaryOperator<DataComponentType.Builder<T>> builder) {
         return (DataComponentType) Registry.register(BuiltInRegistries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.fromNamespaceAndPath(Ballistics.MOD_ID,id), ((DataComponentType.Builder)builder.apply(DataComponentType.builder())).build());

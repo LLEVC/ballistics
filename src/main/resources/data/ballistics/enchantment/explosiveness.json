@@ -1,0 +1,32 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.ballistics.explosiveness"
+  },
+  "max_cost": {
+    "base": 36,
+    "per_level_above_first": 4
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 4,
+    "per_level_above_first": 2
+  },
+  "primary_items": "#ballistics:enchantable/sling",
+  "slots": [
+    "hand"
+  ],
+  "supported_items": "#ballistics:enchantable/sling",
+  "weight": 10,
+  "effects": {
+    "ballistics:throw_power": {
+      "type": "minecraft:multiply",
+      "factor": {
+        "type": "minecraft:linear",
+        "base": 1.15,
+        "per_level_above_first": 0.1
+      }
+    },
+    "ballistics:overcharge_as_power": {}
+  }
+}

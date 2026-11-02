@@ -9,13 +9,18 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.event.client.player.ClientHotbarScrollEvents;
 import net.fabricmc.fabric.api.event.client.player.ClientPlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.client.HotbarManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 
 import java.rmi.registry.Registry;
@@ -25,10 +30,13 @@ public class BallisticsClient implements ClientModInitializer {
 	public static int throwStartTick = 0;
 	public static boolean isCharging = false;
 	public static int maxChargeTime = 40;
+	public static int overchargeAmount = 0;
 
 	public static void startCharging(LocalPlayer localPlayer) {
 		//Ballistics.LOGGER.info("start charge");
 		throwStartTick = localPlayer.tickCount;
+		maxChargeTime = Ballistics.getMaxChargeTime(localPlayer.getMainHandItem(),localPlayer);
+		overchargeAmount = Ballistics.getMaxOvercharge((ItemStack) localPlayer.getMainHandItem(),localPlayer);
 		isCharging = true;
 		ClientPlayNetworking.send(new ServerboundChargePacket(throwStartTick));
 	}
@@ -36,8 +44,10 @@ public class BallisticsClient implements ClientModInitializer {
 	public static void resetCharging() {
 		//Ballistics.LOGGER.info("reset charge");
 		throwStartTick = 0;
+		maxChargeTime = 40;
+		overchargeAmount = 0;
 		isCharging = false;
-		ClientPlayNetworking.send(new ServerboundChargePacket(throwStartTick));
+		ClientPlayNetworking.send(new ServerboundChargePacket(0));
 	}
 
 	@Override
@@ -74,7 +84,7 @@ public class BallisticsClient implements ClientModInitializer {
 			}
 		});
 
-		ClientHotbarScrollEvents.AFTER.register((inventory,currentSlot,newSlot,x,y) -> {
+		ClientHotbarScrollEvents.BEFORE.register((inventory,currentSlot,newSlot,x,y) -> {
 			if (isCharging) resetCharging();
 		});
 	}

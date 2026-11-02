@@ -55,7 +55,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     public final boolean directional;
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, Level level) {
-        this(type,level,true);
+        this(type,level,false);
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, Level level, boolean directional1) {
@@ -65,7 +65,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, double x, double y, double z, Level level, ItemStack itemStack) {
-        this(type,x,y,z,level,itemStack,true);
+        this(type,x,y,z,level,itemStack,false);
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, double x, double y, double z, Level level, ItemStack itemStack, boolean directional1) {
@@ -75,7 +75,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, LivingEntity owner, Level level, ItemStack itemStack) {
-        this(type,owner,level,itemStack,true);
+        this(type,owner,level,itemStack,false);
     }
 
     public ThrownItemProjectile(EntityType<? extends ThrowableItemProjectile> type, LivingEntity owner, Level level, ItemStack itemStack, boolean directional1) {

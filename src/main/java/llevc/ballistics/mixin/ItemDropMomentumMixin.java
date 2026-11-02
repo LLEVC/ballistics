@@ -16,6 +16,8 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseTorchBlock;
 import net.minecraft.world.level.block.FallingBlock;
@@ -49,12 +51,38 @@ public abstract class ItemDropMomentumMixin {
         if (itemEntity != null) {
             Vec3 ogVelo = itemEntity.getDeltaMovement();
             boolean turnToProjectile = false;
+            int overcharge = 0;
             if (bih instanceof Player player) {
                 if (((PlayerInterface) player).ballistics$getUseThrowCharge()) {
-                    float bro = (float) Math.clamp((player.tickCount-((PlayerInterface) player).ballistics$getThrowChargeTime())/38f,0f,1.2f);
+                    int maxOvercharge = ((PlayerInterface) player).ballistics$getMaxOvercharge();
+                    float progress = (player.tickCount-((PlayerInterface) player).ballistics$getThrowChargeTime())/((float) ((PlayerInterface) player).ballistics$getMaxChargeTime());
+                    float progressClamped = Math.clamp(progress,0f,1.0f);
+                    float progressClampedToOvercharge = Math.clamp(progress,0f,maxOvercharge+1f);
+                    boolean overchargeAsPower = EnchantmentHelper.has(player.getOffhandItem().isEmpty() ? itemStack : player.getOffhandItem(), ModEnchantmentEffects.overchargeAsPower);
+                    float power = BallisticsEnchantHelper.getThrowPower(itemStack,player,overchargeAsPower ? progressClampedToOvercharge : progressClamped);
+                    if (!player.getOffhandItem().isEmpty()) {
+                        float scro = BallisticsEnchantHelper.getThrowPower(player.getOffhandItem(), player, power);
+                        if (scro != power) power = scro;
+                    }
                     //Ballistics.LOGGER.info(String.valueOf(bro));
-                    turnToProjectile = bro >= 1.0f;
-                    deltaata = deltaata.add(ogVelo.multiply(bro, bro, bro));
+                    overcharge = (int) Math.clamp(Math.floor(progress-1f),0,maxOvercharge);
+                    if (overcharge > 0 && !overchargeAsPower) {
+                        if (!player.getMainHandItem().isEmpty()) {
+                            int theCheck = player.getMainHandItem().getCount() - overcharge;
+                            //Ballistics.LOGGER.info(String.valueOf(overcharge));
+                            //Ballistics.LOGGER.info(String.valueOf(theCheck));
+                            if (theCheck >= 0) {
+                                player.getMainHandItem().shrink(overcharge);
+                            } else {
+                                overcharge = 0;
+                            }
+                        } else {
+                            overcharge = 0;
+                        }
+                    }
+                    turnToProjectile = progressClamped >= 0.9f;
+                    deltaata = deltaata.add(ogVelo.multiply(power, power, power));
+                    if (overchargeAsPower) overcharge = 0;
                     ((PlayerInterface) player).ballistics$resetThrowCharge();
                 }
             }
@@ -62,7 +90,9 @@ public abstract class ItemDropMomentumMixin {
             Vec3 newVelo = itemEntity.getDeltaMovement();
             if (turnToProjectile) {
                 if (bih.level() instanceof ServerLevel serverLevel) {
-                    ThrownItemProjectile.giveCorrectProjectile(itemStack,serverLevel,bih,itemEntity.position(),newVelo,true);
+                    for (int i = 0; i < overcharge+1; i++) {
+                        ThrownItemProjectile.giveCorrectProjectile(itemStack.copyWithCount(1),serverLevel,bih,itemEntity.position(),newVelo,true);
+                    }
                 }
                 itemEntity = null;
             }

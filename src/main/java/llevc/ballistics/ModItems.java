@@ -74,6 +74,11 @@ public class ModItems {
             Item::new,
             new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15)
     );
+    public static final Item Sling = register(
+            "sling", //stands for Rocket Handling Glove btw
+            Item::new,
+            new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15)
+    );
     public static final Item Flintlock = register(
             "flintlock",
             FlintlockItem::new,
@@ -139,6 +144,7 @@ public class ModItems {
         output.accept(EmptyFlask);
         output.accept(DragonsFlask);
         output.accept(PotionContents.createItemStack(ModItems.Flask, Potions.WATER));
+        output.accept(Sling);
         output.accept(FireworkLauncher);
     }).title(Component.translatable("itemGroup.ballistics")).build();
 
