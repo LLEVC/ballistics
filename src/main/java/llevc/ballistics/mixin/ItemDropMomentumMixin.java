@@ -91,7 +91,13 @@ public abstract class ItemDropMomentumMixin {
             if (turnToProjectile) {
                 if (bih.level() instanceof ServerLevel serverLevel) {
                     for (int i = 0; i < overcharge+1; i++) {
-                        ThrownItemProjectile.giveCorrectProjectile(itemStack.copyWithCount(1),serverLevel,bih,itemEntity.position(),newVelo,true);
+                        ThrownItemProjectile.giveCorrectProjectile(itemStack.copyWithCount(1),serverLevel,bih,itemEntity.position(),
+                                overcharge==0 ?
+                                        newVelo :
+                                        newVelo.normalize()
+                                        .multiply((double) 16 /overcharge, (double) 16 /overcharge, (double) 16 /overcharge).offsetRandom(serverLevel.getRandom(), (float) (i+1)/overcharge)
+                                        .normalize().multiply(newVelo.length(),newVelo.length(),newVelo.length()),
+                                true);
                     }
                 }
                 itemEntity = null;

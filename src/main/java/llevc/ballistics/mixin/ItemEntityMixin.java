@@ -26,31 +26,12 @@ public abstract class ItemEntityMixin extends Entity {
     @Shadow public abstract @Nullable Entity getOwner();
 
     private float airTime = 0f;
-    private boolean primed = false;
-    private boolean exploded = false;
-    private int amount = 1;
 
     @Inject(method = "tick",at=@At("TAIL"))
     public void init(CallbackInfo ci) {
 
         if (!this.onGround() && !this.isInLiquid()) airTime = airTime + 1f;
 
-        if (this.getDeltaMovement().length() > 1.5) primed = true;
-
-        if (!exploded) amount = this.getItem().getCount();
-
         if (level().isClientSide() && airTime > 10f && !this.onGround()) level().addParticle(ParticleTypes.POOF,getX(),getY(),getZ(),0,0,0);
-
-        if (this.getItem().is(Items.END_CRYSTAL)) {
-            if (airTime > 10f && primed && this.onGround()) {
-                DamageSource damageSource2 = this.getOwner() != null ? this.damageSources().explosion(this, this.getOwner()) : null;
-                this.level().explode(this, damageSource2, null, this.getX(), this.getY(), this.getZ(), 6.0F, false, Level.ExplosionInteraction.BLOCK);
-                exploded = true;
-                amount = amount-1;
-                if (amount < 1) {
-                    this.discard();
-                }
-            }
-        }
     }
 }

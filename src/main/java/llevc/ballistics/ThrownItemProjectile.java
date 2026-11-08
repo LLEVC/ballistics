@@ -15,19 +15,19 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.StructureTags;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ProjectileDeflection;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.entity.projectile.*;
 import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -112,6 +112,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             } else {
                 yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
             }
+        } else if (itemStack.getItem() instanceof EnderEyeItem && bih instanceof Player player) {
+            yuh = Projectile.spawnProjectileFromRotation(ThrownEnderpearl::new, serverLevel, itemStack, player, 0.0F, 1.5F, 1.0F);
         } else if (itemStack.getItem() instanceof EntitySpawnItemInterface entitySpawnItemInterface) {
             EntityType<?> type = entitySpawnItemInterface.ballistics$getSpawnEntity();
             Entity entity = type.create(serverLevel, EntitySpawnReason.EVENT);
@@ -121,7 +123,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 entity.setDeltaMovement(newVelo);
                 serverLevel.addFreshEntity(entity);
             }
-        } else if (itemStack.has(DataComponents.WEAPON)) {
+        } else if (itemStack.has(DataComponents.WEAPON) && !itemStack.has(ModComponents.noWeaponConversion)) {
             //ThrownWeaponProjectile thrownItemProjectile = new ThrownWeaponProjectile(bih, bih.level(), itemStack, null);
             //thrownItemProjectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.0f,0.0f);
             //thrownItemProjectile.setDeltaMovement(newVelo);
@@ -387,7 +389,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
 
     private boolean chargedProjectileShoot(Direction direction) {
         ItemStack itemStack = getItem();
-        if (itemStack.has(DataComponents.CHARGED_PROJECTILES) && itemStack.getItem() instanceof CrossbowItem crossbowItem) {
+        if (itemStack.has(DataComponents.CHARGED_PROJECTILES)) {
             ItemStack itemStack1 = itemStack.copy();
             ChargedProjectiles chargedProjectiles = itemStack.getOrDefault(DataComponents.CHARGED_PROJECTILES,ChargedProjectiles.EMPTY);
             List<ItemStack> load = chargedProjectiles.itemCopies().toList();
@@ -418,6 +420,16 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 spawnItemEntity(bucketPickup.pickupBlock(getOwner() != null ? getOwner().asLivingEntity() : null, level(), pos, block));
                 return true;
             }
+        }
+        return false;
+    }
+
+    private boolean exploduh() {
+        ItemStack itemStack = getItem();
+        if (itemStack.is(Items.END_CRYSTAL)) {
+            DamageSource damageSource2 = this.getOwner() != null ? this.damageSources().explosion(this, this.getOwner()) : null;
+            this.level().explode(this, damageSource2, null, this.getX(), this.getY(), this.getZ(), 6.0F, false, Level.ExplosionInteraction.BLOCK);
+            return true;
         }
         return false;
     }
@@ -467,6 +479,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (fireworkExplosion()) return;
             if (placeFluid(hitResult.getEntity().blockPosition(),null)) return;
             if (eatIt(entity.asLivingEntity())) return;
+            if (exploduh()) return;
             int damage = 1;
             if (itemStack.is(Items.BRICK) || itemStack.is(Items.NETHER_BRICK)) damage += 3;
             entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) Math.clamp(Math.ceil(damage * this.getDeltaMovement().length()),0,Integer.MAX_VALUE));
@@ -511,6 +524,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (armorStand(hitResult.getBlockPos(),hitResult.getDirection())) return;
             if (spawnEgg(hitResult.getBlockPos(),hitResult.getDirection())) return;
             if (getOwner() != null && chargedProjectileShoot(hitResult.getDirection())) return;
+            if (exploduh()) return;
             spawnItemEntity();
         }
     }

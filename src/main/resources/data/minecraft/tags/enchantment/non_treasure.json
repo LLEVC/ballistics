@@ -2,9 +2,10 @@
   "replace": false,
   "values": [
     "ballistics:bluntness",
-    "ballistics:graceful",
     "ballistics:gripping",
     "ballistics:handling",
-    "ballistics:quickload"
+    "ballistics:quickload",
+    "ballistics:acceleration",
+    "ballistics:explosiveness"
   ]
 }

@@ -16,7 +16,7 @@
   "slots": [
     "hand"
   ],
-  "supported_items": "#ballistics:enchantable/sling",
+  "supported_items": "#ballistics:enchantable/thrower",
   "weight": 10,
   "effects": {
     "ballistics:throw_cooldown": {
@@ -24,7 +24,7 @@
       "factor": {
         "type": "minecraft:linear",
         "base": 0.9,
-        "per_level_above_first": 0.05
+        "per_level_above_first": -0.075
       }
     }
   }

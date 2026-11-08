@@ -16,7 +16,7 @@
   "slots": [
     "hand"
   ],
-  "supported_items": "#ballistics:enchantable/sling",
+  "supported_items": "#ballistics:enchantable/thrower",
   "weight": 10,
   "effects": {
     "ballistics:throw_power": {

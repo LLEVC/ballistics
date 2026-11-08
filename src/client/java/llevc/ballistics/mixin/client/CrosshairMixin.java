@@ -88,7 +88,7 @@ public abstract class CrosshairMixin {
                 float chargeAmt = Math.clamp(getUncappedChargeTime(this.minecraft.player)-1f,0f,BallisticsClient.overchargeAmount);
                 float overallProgress = (float) Math.floor(chargeAmt);
                 float progress = (chargeAmt-overallProgress);
-                List<Integer> colorList = List.of(CommonColors.GREEN,CommonColors.YELLOW,CommonColors.SOFT_RED);
+                List<Integer> colorList = List.of(CommonColors.GREEN,CommonColors.YELLOW,CommonColors.SOFT_RED,CommonColors.HIGH_CONTRAST_DIAMOND);
                 if (overallProgress > 0 && overallProgress != chargeAmt-1) {
                     graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CROSSHAIR_ATTACK_INDICATOR_FULL_SPRITE, graphics.guiWidth() / 2 - 8, graphics.guiHeight() / 2 - 7 + 16, 16, 16, colorList.get((int) ((overallProgress-1) % (colorList.size()))));
                 } else if (overallProgress > 0 && overallProgress == chargeAmt-1) {
