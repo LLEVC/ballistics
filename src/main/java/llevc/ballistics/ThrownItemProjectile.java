@@ -84,11 +84,11 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         this.directional = directional1;
     }
 
-    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView) {
-        return giveCorrectProjectile(itemStack,serverLevel,bih,position,newVelo,addView,false,bih.isHolding(ModItems.rhGlove));
+    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView, float power) {
+        return giveCorrectProjectile(itemStack,serverLevel,bih,position,newVelo,addView,false,bih.isHolding(ModItems.rhGlove), power);
     }
 
-    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView, boolean projectileVeloBased, boolean igniteFirework) {
+    public static @Nullable Entity giveCorrectProjectile(ItemStack itemStack, ServerLevel serverLevel, LivingEntity bih, Vec3 position, Vec3 newVelo, boolean addView, boolean projectileVeloBased, boolean igniteFirework, float power) {
         boolean isFirework = itemStack.getItem() instanceof FireworkRocketItem;
         Entity yuh;
         if (itemStack.getItem() instanceof ProjectileItem projectileItem && !itemStack.is(ModItems.projectileThrowBlacklist) && (!isFirework || igniteFirework)) {
@@ -97,23 +97,23 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             Projectile projectile = projectileItem.asProjectile(serverLevel, addView ? position.add(viewVector) : position,itemStack, Direction.NORTH);
             projectile.setOwner(bih);
             if (projectileVeloBased) {
-                projectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.5f,1f);
+                projectile.shoot(newVelo.x,newVelo.y,newVelo.z,1.5f*power,1f);
             } else {
-                projectile.shootFromRotation(bih, bih.getXRot(), bih.getYRot(), 0f, 1.5f, 1f);
+                projectile.shootFromRotation(bih, bih.getXRot(), bih.getYRot(), 0f, 1.5f*power, 1f);
             }
             yuh = Projectile.spawnProjectile(projectile,serverLevel,itemStack);
         } else if (itemStack.getItem() instanceof TridentItem) {
             ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
             if (projectileVeloBased) {
                 yuh = Projectile.spawnProjectile(((ProjectileFactory<ThrownTrident>) ThrownTrident::new).create(serverLevel, bih, returnItemStack), serverLevel, returnItemStack, (trident) -> {
-                    trident.shoot(newVelo.x, newVelo.y, newVelo.z, 2.5f, 1f);
+                    trident.shoot(newVelo.x, newVelo.y, newVelo.z, 2.5f*power, 1f);
                     trident.setPos(position);
                 });
             } else {
-                yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
+                yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f*power, 1f);
             }
-        } else if (itemStack.getItem() instanceof EnderEyeItem && bih instanceof Player player) {
-            yuh = Projectile.spawnProjectileFromRotation(ThrownEnderpearl::new, serverLevel, itemStack, player, 0.0F, 1.5F, 1.0F);
+        } else if (itemStack.getItem() instanceof EnderpearlItem && bih instanceof Player player) {
+            yuh = Projectile.spawnProjectileFromRotation(ThrownEnderpearl::new, serverLevel, itemStack, player, 0.0F, 1.5F*power, 1.0F);
         } else if (itemStack.getItem() instanceof EntitySpawnItemInterface entitySpawnItemInterface) {
             EntityType<?> type = entitySpawnItemInterface.ballistics$getSpawnEntity();
             Entity entity = type.create(serverLevel, EntitySpawnReason.EVENT);
@@ -134,11 +134,11 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             ItemStack returnItemStack = itemStack.consumeAndReturn(1, bih);
             if (projectileVeloBased) {
                 yuh = Projectile.spawnProjectile(((ProjectileFactory<ThrownWeaponProjectile>) ThrownWeaponProjectile::new).create(serverLevel,bih,itemStack), serverLevel, returnItemStack, (trident) -> {
-                    trident.shoot(newVelo.x, newVelo.y, newVelo.z, 2.5f, 1f);
+                    trident.shoot(newVelo.x, newVelo.y, newVelo.z, 2.5f*power, 1f);
                     trident.setPos(position);
                 });
             } else {
-                yuh = Projectile.spawnProjectileFromRotation(ThrownWeaponProjectile::new, serverLevel, returnItemStack, bih, 0, 2.5f, 1f);
+                yuh = Projectile.spawnProjectileFromRotation(ThrownWeaponProjectile::new, serverLevel, returnItemStack, bih, 0, 2.5f*power, 1f);
             }
 
         } else {
@@ -350,7 +350,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                             velo,
                             false,
                             true,
-                            hasIgnition
+                            hasIgnition,
+                            1.0f
                     );
                 }
             }

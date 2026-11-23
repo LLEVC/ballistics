@@ -52,6 +52,7 @@ public abstract class ItemDropMomentumMixin {
             Vec3 ogVelo = itemEntity.getDeltaMovement();
             boolean turnToProjectile = false;
             int overcharge = 0;
+            float power = 0f;
             if (bih instanceof Player player) {
                 if (((PlayerInterface) player).ballistics$getUseThrowCharge()) {
                     int maxOvercharge = ((PlayerInterface) player).ballistics$getMaxOvercharge();
@@ -59,7 +60,7 @@ public abstract class ItemDropMomentumMixin {
                     float progressClamped = Math.clamp(progress,0f,1.0f);
                     float progressClampedToOvercharge = Math.clamp(progress,0f,maxOvercharge+1f);
                     boolean overchargeAsPower = EnchantmentHelper.has(player.getOffhandItem().isEmpty() ? itemStack : player.getOffhandItem(), ModEnchantmentEffects.overchargeAsPower);
-                    float power = BallisticsEnchantHelper.getThrowPower(itemStack,player,overchargeAsPower ? progressClampedToOvercharge : progressClamped);
+                    power = BallisticsEnchantHelper.getThrowPower(itemStack,player,overchargeAsPower ? progressClampedToOvercharge : progressClamped);
                     if (!player.getOffhandItem().isEmpty()) {
                         float scro = BallisticsEnchantHelper.getThrowPower(player.getOffhandItem(), player, power);
                         if (scro != power) power = scro;
@@ -97,7 +98,9 @@ public abstract class ItemDropMomentumMixin {
                                         newVelo.normalize()
                                         .multiply((double) 16 /overcharge, (double) 16 /overcharge, (double) 16 /overcharge).offsetRandom(serverLevel.getRandom(), (float) (i+1)/overcharge)
                                         .normalize().multiply(newVelo.length(),newVelo.length(),newVelo.length()),
-                                true);
+                                true,
+                                        power
+                                );
                     }
                 }
                 itemEntity = null;
