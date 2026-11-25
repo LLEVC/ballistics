@@ -512,7 +512,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                     for (int b = 0; b < 3; b++) {
                         for (int c = 0; c < 3; c++) {
                             BlockPos off = hitResult.getBlockPos().offset(1-a,1-b,1-c);
-                            Ballistics.LOGGER.info(String.valueOf(off));
+                            //Ballistics.LOGGER.info(String.valueOf(off));
                             if (off != hitResult.getBlockPos()) colorTheWorld(level().getBlockState(off),off);
                         }
                     }
