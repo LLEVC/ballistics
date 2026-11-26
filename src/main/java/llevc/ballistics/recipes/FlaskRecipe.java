@@ -104,7 +104,7 @@ public class FlaskRecipe extends CustomRecipe {
                 gamer = PotionContents.createItemStack(ModItems.Flask, death.potion().orElse(Potions.WATER));
             }
             gamer.set(DataComponents.POTION_CONTENTS, death);
-            gamer.set(DataComponents.RARITY,gamer.getRarity());
+            gamer.set(DataComponents.RARITY,potion.getRarity());
             result = gamer;
         }
 

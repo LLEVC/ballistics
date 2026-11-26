@@ -99,8 +99,13 @@ public abstract class ItemDropMomentumMixin {
                                         .multiply((double) 16 /overcharge, (double) 16 /overcharge, (double) 16 /overcharge).offsetRandom(serverLevel.getRandom(), (float) (i+1)/overcharge)
                                         .normalize().multiply(newVelo.length(),newVelo.length(),newVelo.length()),
                                 true,
+                                        false,
+                                        bih.isHolding(ModItems.rhGlove) || bih.getOffhandItem().is(ModItems.ignitesFireworksInBundles),
                                         power
                                 );
+                        if (itemStack.getItem() instanceof FireworkRocketItem && bih.getOffhandItem().is(ModItems.ignitesFireworksInBundles)) {
+                            bih.getOffhandItem().consume(1,bih);
+                        }
                     }
                 }
                 itemEntity = null;
@@ -108,13 +113,5 @@ public abstract class ItemDropMomentumMixin {
             //Ballistics.LOGGER.info(String.valueOf(deltaata));
             cir.setReturnValue(itemEntity);
         }
-    }
-
-    @Unique
-    private boolean isFallingBlock(ItemStack itemStack) {
-        if (itemStack.getItem() instanceof BlockItem blockItem) {
-            return blockItem.getBlock() instanceof FallingBlock;
-        }
-        return false;
     }
 }

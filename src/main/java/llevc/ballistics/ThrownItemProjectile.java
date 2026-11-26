@@ -12,15 +12,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.StructureTags;
+import net.minecraft.tags.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,8 +32,10 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -268,6 +268,41 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         return false;
     }
 
+    private boolean equipIt(LivingEntity player) {
+        ItemStack itemStack = getItem();
+        if (itemStack.has(DataComponents.EQUIPPABLE)) {
+            Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
+            if (!player.hasItemInSlot(equippable.slot()) && player.isEquippableInSlot(itemStack,equippable.slot())) {
+                player.setItemSlot(equippable.slot(),itemStack);
+                level().playSound(null,blockPosition(),equippable.equipSound().value(), SoundSource.PLAYERS);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean bees(@Nullable LivingEntity target) {
+        ItemStack itemStack = getItem();
+        if (itemStack.has(DataComponents.BEES)) {
+            Bees bees = itemStack.get(DataComponents.BEES);
+            if (!bees.bees().isEmpty()) {
+                for (BeehiveBlockEntity.Occupant bee : bees.bees()) {
+                    Bee realBee = new Bee(EntityTypes.BEE,level());
+                    realBee.setPos(position());
+                    realBee.setHivePos(blockPosition());
+                    realBee.setTarget(target == null ? (getOwner() == null ? null : getOwner().asLivingEntity()) : target);
+                    level().addFreshEntity(realBee);
+                }
+
+                ItemStack itemStack1 = itemStack.copy();
+                itemStack1.set(DataComponents.BEES,Bees.EMPTY);
+                spawnItemEntity(itemStack1);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean colorTheWorld(BlockState block, BlockPos pos) {
         ItemStack itemStack = getItem();
         if (itemStack.has(DataComponents.DYE)) {
@@ -319,44 +354,59 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         return false;
     }
 
-    private boolean bundled(Direction direction) {
+    private boolean bundled(Direction direction, @Nullable Entity entity) {
         ItemStack itemStack = getItem();
         if (itemStack.is(ItemTags.BUNDLES)) {
             BundleContents bundleContents = itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS,BundleContents.EMPTY);
-            List<ItemStackTemplate> list = new ArrayList<>(List.of());
-            boolean hasIgnition = false;
-            for (ItemStackTemplate itemStackTemplate : bundleContents.items()) {
-                if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() <= 1) hasIgnition = true;
-                else if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() > 1) {
-                    hasIgnition = true;
-                    list.add(itemStackTemplate.withCount(itemStackTemplate.count()-1));
-                } else {
-                    list.add(itemStackTemplate);
-                }
-            }
-            for (ItemStackTemplate itemStackTemplate : list) {
-                ItemStack itemStack1 = itemStackTemplate.create();
-                for (int i = 0; i < itemStack1.count(); i++) {
-                    Vec3 velo = new Vec3(
-                            random.nextIntBetweenInclusive(-8,8),
-                            random.nextIntBetweenInclusive(-8,8),
-                            random.nextIntBetweenInclusive(-8,8)
-                    ).add(direction.getUnitVec3().multiply(8,8,8)).multiply(0.05,0.05,0.05);
-                    Entity thrownItemProjectile = giveCorrectProjectile(
-                            itemStack1.copyWithCount(1),
-                            ((ServerLevel)level()),
-                            Objects.requireNonNull(getOwner()).asLivingEntity(),
-                            position().add(0,0.125,0).add(direction.getUnitVec3()),
-                            velo,
-                            false,
-                            true,
-                            hasIgnition,
-                            1.0f
-                    );
-                }
-            }
             ItemStack itemStack1 = itemStack.copy();
-            itemStack1.set(DataComponents.BUNDLE_CONTENTS,BundleContents.EMPTY);
+            if (bundleContents.isEmpty() && entity != null) {
+                if (entity instanceof LivingEntity livingEntity) {
+                    InteractionHand priority = (livingEntity.isBlocking() || livingEntity.getMainHandItem().isEmpty()) ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+                    ItemStack itemStack2 = livingEntity.getItemInHand(priority);
+                    if (!itemStack2.isEmpty()) {
+                        BundleContents newBundleContents = new BundleContents(List.of(ItemStackTemplate.fromStack(itemStack2)));
+                        itemStack1.set(DataComponents.BUNDLE_CONTENTS, newBundleContents);
+                        livingEntity.setItemInHand(priority,ItemStack.EMPTY);
+                        level().playSound(null,blockPosition(),SoundEvents.BUNDLE_INSERT,SoundSource.PLAYERS);
+                    }
+                }
+            } else if (!bundleContents.isEmpty()) {
+                List<ItemStackTemplate> list = new ArrayList<>(List.of());
+                boolean hasIgnition = false;
+                for (ItemStackTemplate itemStackTemplate : bundleContents.items()) {
+                    if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() <= 1)
+                        hasIgnition = true;
+                    else if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() > 1) {
+                        hasIgnition = true;
+                        list.add(itemStackTemplate.withCount(itemStackTemplate.count() - 1));
+                    } else {
+                        list.add(itemStackTemplate);
+                    }
+                }
+                for (ItemStackTemplate itemStackTemplate : list) {
+                    ItemStack itemStack2 = itemStackTemplate.create();
+                    for (int i = 0; i < itemStack1.count(); i++) {
+                        Vec3 velo = new Vec3(
+                                random.nextIntBetweenInclusive(-8, 8),
+                                random.nextIntBetweenInclusive(-8, 8),
+                                random.nextIntBetweenInclusive(-8, 8)
+                        ).add(direction.getUnitVec3().multiply(8, 8, 8)).multiply(0.05, 0.05, 0.05);
+                        Entity thrownItemProjectile = giveCorrectProjectile(
+                                itemStack1.copyWithCount(1),
+                                ((ServerLevel) level()),
+                                Objects.requireNonNull(getOwner()).asLivingEntity(),
+                                position().add(0, 0.125, 0).add(direction.getUnitVec3()),
+                                velo,
+                                false,
+                                true,
+                                hasIgnition,
+                                1.0f
+                        );
+                    }
+                }
+                level().playSound(null,blockPosition(),SoundEvents.BUNDLE_DROP_CONTENTS,SoundSource.PLAYERS);
+                itemStack1.set(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY);
+            }
             spawnItemEntity(itemStack1);
             return true;
         }
@@ -435,6 +485,18 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         return false;
     }
 
+    private boolean fallingBlockPlace(BlockPos blockPos) {
+        ItemStack itemStack = getItem();
+        if (itemStack.getItem() instanceof BlockItem blockItem) {
+            if (blockItem.getBlock() instanceof FallingBlock) {
+                level().destroyBlock(blockPos,true);
+                level().setBlockAndUpdate(blockPos,blockItem.getBlock().defaultBlockState());
+                return true;
+            }
+        }
+        return false;
+    }
+
     private BlockState copyWithColor(BlockState blockState, ColorCollection<Block> block, DyeColor dyeColor) {
         return ((Block)getColorOfBlock(block,dyeColor)).defaultBlockState().withPropertiesOf(blockState);
     }
@@ -465,11 +527,16 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         if (itemStack.is(item)) effectList.add(mobEffectInstance);
     }
 
+    private void attemptEffect(ItemStack itemStack, TagKey<Item> item, MobEffectInstance mobEffectInstance, List<MobEffectInstance> effectList) {
+        if (itemStack.is(item)) effectList.add(mobEffectInstance);
+    }
+
     private List<MobEffectInstance> processPotions(ItemStack itemStack) {
         List<MobEffectInstance> effectList = new ArrayList<>(List.of());
         attemptEffect(itemStack,Items.SLIME_BLOCK,new MobEffectInstance(MobEffects.OOZING,20*20),effectList);
         attemptEffect(itemStack,Items.SLIME_BALL,new MobEffectInstance(MobEffects.OOZING,60*20),effectList);
         attemptEffect(itemStack,Items.WITHER_ROSE,new MobEffectInstance(MobEffects.WITHER,3*20),effectList);
+        attemptEffect(itemStack,ItemTags.SAND, new MobEffectInstance(MobEffects.BLINDNESS,40),effectList);
         return effectList;
     }
 
@@ -480,12 +547,14 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (fireworkExplosion()) return;
             if (placeFluid(hitResult.getEntity().blockPosition(),null)) return;
             if (eatIt(entity.asLivingEntity())) return;
+            if (equipIt(entity.asLivingEntity())) return;
             if (exploduh()) return;
             int damage = 1;
             if (itemStack.is(Items.BRICK) || itemStack.is(Items.NETHER_BRICK)) damage += 3;
             entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) Math.clamp(Math.ceil(damage * this.getDeltaMovement().length()),0,Integer.MAX_VALUE));
+            if (bees(hitResult.getEntity().asLivingEntity())) return;
             if (isTorch()) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+60 : 60);
-            if (itemStack.is(Items.NETHER_BRICK)) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+20 : 20);
+            //if (itemStack.is(Items.NETHER_BRICK)) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+20 : 20);
             if (entity instanceof LivingEntity livingEntity) {
                 List<MobEffectInstance> effectList = processPotions(itemStack);
                 for (MobEffectInstance mobEffectInstance : effectList) {
@@ -493,11 +562,12 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 }
             }
             if (bricked(Direction.getApproximateNearest(getDeltaMovement()))) return;
-            if (bundled(Direction.getApproximateNearest(getDeltaMovement()))) return;
+            if (bundled(Direction.getApproximateNearest(getDeltaMovement()),hitResult.getEntity())) return;
             if (armorStand(entity.blockPosition(),Direction.UP)) return;
             if (spawnEgg(entity.blockPosition(),Direction.UP)) return;
             if (getOwner() != null && chargedProjectileShoot(Direction.getApproximateNearest(getDeltaMovement()))) return;
             spawnItemEntity();
+            if (getItem().is(Items.BELL)) level().playSound(null,blockPosition(),SoundEvents.BELL_BLOCK,SoundSource.BLOCKS);
         }
     }
 
@@ -521,12 +591,15 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 return;
             }
             if (bricked(hitResult.getDirection())) return;
-            if (bundled(hitResult.getDirection())) return;
+            if (bundled(hitResult.getDirection(),null)) return;
             if (armorStand(hitResult.getBlockPos(),hitResult.getDirection())) return;
             if (spawnEgg(hitResult.getBlockPos(),hitResult.getDirection())) return;
             if (getOwner() != null && chargedProjectileShoot(hitResult.getDirection())) return;
             if (exploduh()) return;
+            if (fallingBlockPlace(hitResult.getBlockPos())) return;
+            if (bees(null)) return;
             spawnItemEntity();
+            if (getItem().is(Items.BELL)) level().playSound(null,blockPosition(),SoundEvents.BELL_BLOCK,SoundSource.BLOCKS);
         }
     }
 
