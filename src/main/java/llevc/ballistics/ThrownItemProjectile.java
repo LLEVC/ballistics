@@ -335,7 +335,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
 
     private boolean boneIt(BlockHitResult hitResult) {
         ItemStack itemStack = getItem();
-        if (itemStack.getItem() instanceof BoneMealItem boneMealItem && getOwner() instanceof Player player) {
+        if (itemStack.getItem() instanceof BoneMealItem boneMealItem) {
             boneMealItem.useOn(new UseOnContext(level(),null,InteractionHand.MAIN_HAND,itemStack,hitResult));
             return true;
         }
