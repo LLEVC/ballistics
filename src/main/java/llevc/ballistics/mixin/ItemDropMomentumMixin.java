@@ -82,7 +82,7 @@ public abstract class ItemDropMomentumMixin {
                         }
                     }
                     turnToProjectile = progressClamped >= 0.9f;
-                    deltaata = deltaata.add(ogVelo.multiply(power, power, power));
+                    deltaata = deltaata.add(ogVelo.normalize().add(bih.getHeadLookAngle().multiply(2,2,2)).normalize().multiply(ogVelo.length(),ogVelo.length(),ogVelo.length()).multiply(power,power,power));
                     if (overchargeAsPower) overcharge = 0;
                     ((PlayerInterface) player).ballistics$resetThrowCharge();
                 }

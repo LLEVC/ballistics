@@ -73,12 +73,12 @@ public class ModItems {
     public static final Item rhGlove = register(
             "rh_glove", //stands for Rocket Handling Glove btw
             Item::new,
-            new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15)
+            new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15).equippable(EquipmentSlot.OFFHAND)
     );
     public static final Item Sling = register(
             "sling", //stands for Rocket Handling Glove btw
             Item::new,
-            new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15)
+            new Item.Properties().durability(64).repairable(ItemTags.REPAIRS_LEATHER_ARMOR).enchantable(15).equippable(EquipmentSlot.OFFHAND)
     );
     public static final Item Flintlock = register(
             "flintlock",

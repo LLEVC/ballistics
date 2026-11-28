@@ -29,6 +29,7 @@
   "sound.ballistics.flintlock_click": "Flintlock click",
   "sound.ballistics.flintlock_hit": "Flintlock ball hit",
   "sound.ballistics.flintlock_miss": "Flintlock ball missed",
+  "sound.ballistics.throw_charge": "Throw charged",
 
   "item.minecraft.potion.effect.mixed": "Mixed Potion",
   "item.minecraft.splash_potion.effect.mixed": "Mixed Splash Potion",

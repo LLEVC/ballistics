@@ -1,6 +1,5 @@
 package llevc.ballistics;
 
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -9,10 +8,10 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.*;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -28,18 +27,14 @@ import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableIt
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.*;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -247,6 +242,18 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             Vec3i off = direction.getStep();
             level().destroyBlock(pos.offset(off),true);
             level().setBlockAndUpdate(pos.offset(off),direction == Direction.UP ? blockItem.getBlock().defaultBlockState() : ((StandingWallBlockItemInterface) blockItem).ballistics$getWallBlock().defaultBlockState().rotate(getDirectionRotation(direction)));
+            level().playSound(null,blockPosition(),SoundEvents.WOOD_PLACE,SoundSource.BLOCKS);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean placeFire(BlockPos pos, Direction direction) {
+        ItemStack itemStack = getItem();
+        if (itemStack.is(Items.FLINT_AND_STEEL) && direction != Direction.DOWN) {
+            Vec3i off = direction.getStep();
+            level().destroyBlock(pos.offset(off),true);
+            level().setBlockAndUpdate(pos.offset(off),BaseFireBlock.getState(level(),pos.offset(off)));
             return true;
         }
         return false;
@@ -264,6 +271,19 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             player.hurtServer(((ServerLevel) level()),damageSources().mobProjectile(this, (LivingEntity) getOwner()),1f);
             if (useRemainder != null) spawnItemEntity(useRemainder.convertInto().create());
             return true;
+        } else if (itemStack.is(Items.CAKE)) {
+            if (player instanceof Player player1) {
+                BlockItemStateProperties bsProperties = itemStack.getOrDefault(DataComponents.BLOCK_STATE,BlockItemStateProperties.EMPTY); //the bs stands for blockstate, not something else 👀
+                int amount = 7;
+                if (!bsProperties.isEmpty()) {
+                    if (bsProperties.get(CakeBlock.BITES) != null) {
+                        amount -= bsProperties.get(CakeBlock.BITES);
+                    }
+                }
+                player1.getFoodData().eat(2*amount,0.1f*amount);
+                level().playSound(null, blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, Mth.randomBetween(random, 0.9F, 1.0F));
+            }
+            return true;
         }
         return false;
     }
@@ -272,11 +292,21 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
         ItemStack itemStack = getItem();
         if (itemStack.has(DataComponents.EQUIPPABLE)) {
             Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
-            if (!player.hasItemInSlot(equippable.slot()) && player.isEquippableInSlot(itemStack,equippable.slot())) {
+            if (!player.hasItemInSlot(equippable.slot()) && player.isEquippableInSlot(itemStack,equippable.slot()) && equippable.slot().isArmor()) {
                 player.setItemSlot(equippable.slot(),itemStack);
                 level().playSound(null,blockPosition(),equippable.equipSound().value(), SoundSource.PLAYERS);
                 return true;
             }
+        }
+        return false;
+    }
+
+    private boolean playIt() {
+        ItemStack itemStack = getItem();
+        if (itemStack.has(DataComponents.INSTRUMENT)) {
+            InstrumentComponent instrument = itemStack.get(DataComponents.INSTRUMENT);
+            level().playSound(null,blockPosition(),instrument.instrument().value().soundEvent().value(),SoundSource.PLAYERS);
+            return true;
         }
         return false;
     }
@@ -299,6 +329,15 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 spawnItemEntity(itemStack1);
                 return true;
             }
+        }
+        return false;
+    }
+
+    private boolean boneIt(BlockHitResult hitResult) {
+        ItemStack itemStack = getItem();
+        if (itemStack.getItem() instanceof BoneMealItem boneMealItem && getOwner() instanceof Player player) {
+            boneMealItem.useOn(new UseOnContext(level(),null,InteractionHand.MAIN_HAND,itemStack,hitResult));
+            return true;
         }
         return false;
     }
@@ -370,6 +409,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                         level().playSound(null,blockPosition(),SoundEvents.BUNDLE_INSERT,SoundSource.PLAYERS);
                     }
                 }
+                spawnItemEntity(itemStack1);
+                return true;
             } else if (!bundleContents.isEmpty()) {
                 List<ItemStackTemplate> list = new ArrayList<>(List.of());
                 boolean hasIgnition = false;
@@ -385,14 +426,14 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 }
                 for (ItemStackTemplate itemStackTemplate : list) {
                     ItemStack itemStack2 = itemStackTemplate.create();
-                    for (int i = 0; i < itemStack1.count(); i++) {
+                    for (int i = 0; i < itemStack2.count(); i++) {
                         Vec3 velo = new Vec3(
                                 random.nextIntBetweenInclusive(-8, 8),
                                 random.nextIntBetweenInclusive(-8, 8),
                                 random.nextIntBetweenInclusive(-8, 8)
                         ).add(direction.getUnitVec3().multiply(8, 8, 8)).multiply(0.05, 0.05, 0.05);
                         Entity thrownItemProjectile = giveCorrectProjectile(
-                                itemStack1.copyWithCount(1),
+                                itemStack2.copyWithCount(1),
                                 ((ServerLevel) level()),
                                 Objects.requireNonNull(getOwner()).asLivingEntity(),
                                 position().add(0, 0.125, 0).add(direction.getUnitVec3()),
@@ -406,9 +447,9 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 }
                 level().playSound(null,blockPosition(),SoundEvents.BUNDLE_DROP_CONTENTS,SoundSource.PLAYERS);
                 itemStack1.set(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY);
+                spawnItemEntity(itemStack1);
+                return true;
             }
-            spawnItemEntity(itemStack1);
-            return true;
         }
         return false;
     }
@@ -533,10 +574,11 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
 
     private List<MobEffectInstance> processPotions(ItemStack itemStack) {
         List<MobEffectInstance> effectList = new ArrayList<>(List.of());
-        attemptEffect(itemStack,Items.SLIME_BLOCK,new MobEffectInstance(MobEffects.OOZING,20*20),effectList);
-        attemptEffect(itemStack,Items.SLIME_BALL,new MobEffectInstance(MobEffects.OOZING,60*20),effectList);
+        attemptEffect(itemStack,Items.SLIME_BLOCK,new MobEffectInstance(MobEffects.OOZING,60*20),effectList);
+        attemptEffect(itemStack,Items.SLIME_BALL,new MobEffectInstance(MobEffects.OOZING,20*20),effectList);
         attemptEffect(itemStack,Items.WITHER_ROSE,new MobEffectInstance(MobEffects.WITHER,3*20),effectList);
         attemptEffect(itemStack,ItemTags.SAND, new MobEffectInstance(MobEffects.BLINDNESS,40),effectList);
+        if (itemStack.getRarity().equals(Rarity.UNCOMMON)) attemptEffect(itemStack,ItemTags.BANNERS,new MobEffectInstance(MobEffects.BAD_OMEN,20*60),effectList);
         return effectList;
     }
 
@@ -553,7 +595,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (itemStack.is(Items.BRICK) || itemStack.is(Items.NETHER_BRICK)) damage += 3;
             entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float) Math.clamp(Math.ceil(damage * this.getDeltaMovement().length()),0,Integer.MAX_VALUE));
             if (bees(hitResult.getEntity().asLivingEntity())) return;
-            if (isTorch()) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+60 : 60);
+            if (isTorch() || itemStack.is(Items.FLINT_AND_STEEL)) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+60 : 60);
+            if (itemStack.is(Items.FLINT_AND_STEEL)) level().playSound(null,blockPosition(),SoundEvents.FLINTANDSTEEL_USE,SoundSource.BLOCKS);
             //if (itemStack.is(Items.NETHER_BRICK)) entity.setRemainingFireTicks(entity.isOnFire() ? entity.getRemainingFireTicks()+20 : 20);
             if (entity instanceof LivingEntity livingEntity) {
                 List<MobEffectInstance> effectList = processPotions(itemStack);
@@ -567,7 +610,9 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (spawnEgg(entity.blockPosition(),Direction.UP)) return;
             if (getOwner() != null && chargedProjectileShoot(Direction.getApproximateNearest(getDeltaMovement()))) return;
             spawnItemEntity();
+            if (playIt()) return;
             if (getItem().is(Items.BELL)) level().playSound(null,blockPosition(),SoundEvents.BELL_BLOCK,SoundSource.BLOCKS);
+            if (getItem().is(Items.SLIME_BLOCK) || getItem().is(Items.SLIME_BALL)) level().playSound(null,blockPosition(),SoundEvents.SLIME_SQUISH,SoundSource.BLOCKS);
         }
     }
 
@@ -577,6 +622,7 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (fireworkExplosion()) return;
             if (placeFluid(hitResult.getBlockPos(),hitResult.getDirection())) return;
             if (placeTorch(hitResult.getBlockPos(),hitResult.getDirection())) return;
+            if (placeFire(hitResult.getBlockPos(),hitResult.getDirection())) level().playSound(null,blockPosition(),SoundEvents.FLINTANDSTEEL_USE,SoundSource.BLOCKS);
             if (colorTheWorld(level().getBlockState(hitResult.getBlockPos()),hitResult.getBlockPos())) {
                 for (int a = 0; a < 3; a++) {
                     for (int b = 0; b < 3; b++) {
@@ -598,8 +644,10 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
             if (exploduh()) return;
             if (fallingBlockPlace(hitResult.getBlockPos())) return;
             if (bees(null)) return;
+            if (boneIt(hitResult)) return;
             spawnItemEntity();
             if (getItem().is(Items.BELL)) level().playSound(null,blockPosition(),SoundEvents.BELL_BLOCK,SoundSource.BLOCKS);
+            if (getItem().is(Items.SLIME_BLOCK) || getItem().is(Items.SLIME_BALL)) level().playSound(null,blockPosition(),SoundEvents.SLIME_SQUISH,SoundSource.BLOCKS);
         }
     }
 

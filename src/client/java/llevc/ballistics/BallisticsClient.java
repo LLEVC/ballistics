@@ -18,6 +18,8 @@ import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacket;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -32,6 +34,8 @@ public class BallisticsClient implements ClientModInitializer {
 	public static boolean isCharging = false;
 	public static int maxChargeTime = 40;
 	public static int overchargeAmount = 0;
+	public static int slotSelected = 0;
+	public static int noiseCheck = 1;
 
 	public static void startCharging(LocalPlayer localPlayer) {
 		//Ballistics.LOGGER.info("start charge");
@@ -39,6 +43,8 @@ public class BallisticsClient implements ClientModInitializer {
 		maxChargeTime = Ballistics.getMaxChargeTime(localPlayer.getMainHandItem(),localPlayer);
 		overchargeAmount = Ballistics.getMaxOvercharge((ItemStack) localPlayer.getMainHandItem(),localPlayer);
 		isCharging = true;
+		slotSelected = localPlayer.getInventory().getSelectedSlot();
+		noiseCheck = 0;
 		ClientPlayNetworking.send(new ServerboundChargePacket(throwStartTick));
 	}
 
@@ -48,6 +54,8 @@ public class BallisticsClient implements ClientModInitializer {
 		maxChargeTime = 40;
 		overchargeAmount = 0;
 		isCharging = false;
+		slotSelected = 0;
+		noiseCheck = 1;
 		ClientPlayNetworking.send(new ServerboundChargePacket(0));
 	}
 
@@ -70,6 +78,18 @@ public class BallisticsClient implements ClientModInitializer {
 			//Ballistics.LOGGER.info(String.valueOf(client.options.keyDrop.isDown()) + " isDown");
 
 			if (client.player.hasItemInSlot(EquipmentSlot.MAINHAND)) {
+				if (slotSelected != client.player.getInventory().getSelectedSlot()) {
+					isCharging = false;
+					resetCharging();
+				}
+
+				for (int i = 0; i < overchargeAmount+1; i++) {
+					if (client.player.tickCount-throwStartTick >= maxChargeTime*(i+1) && noiseCheck < i+1) {
+						noiseCheck = i+1;
+						client.level.playPlayerSound(ModSounds.ThrowCharge, SoundSource.PLAYERS, 0.5f, (1f + ((float) i / overchargeAmount)));
+					}
+				}
+
 				if (!isCharging && !client.options.keyDrop.isDown() && throwStartTick > 0) {
 					resetCharging();
 				} else if (client.options.keyDrop.isDown() && !isCharging && !client.hasControlDown()) {
@@ -83,10 +103,6 @@ public class BallisticsClient implements ClientModInitializer {
 			} else if (isCharging || throwStartTick > 0) {
 				resetCharging();
 			}
-		});
-
-		ClientHotbarScrollEvents.BEFORE.register((inventory,currentSlot,newSlot,x,y) -> {
-			if (isCharging) resetCharging();
 		});
 	}
 }

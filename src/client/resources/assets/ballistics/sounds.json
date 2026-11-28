@@ -18,5 +18,9 @@
   "flintlock_miss": {
     "subtitle": "sound.ballistics.flintlock_miss",
     "sounds": [{"name": "ballistics:flintlockballhit"}]
+  },
+  "throw_charge": {
+    "subtitle": "sound.ballistics.throw_charge",
+    "sounds": [{"name": "random/click"}]
   }
 }
