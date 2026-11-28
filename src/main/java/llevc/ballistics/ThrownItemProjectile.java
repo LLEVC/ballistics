@@ -108,7 +108,14 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                 yuh = Projectile.spawnProjectileFromRotation(ThrownTrident::new, serverLevel, returnItemStack, bih, 0, 2.5f*power, 1f);
             }
         } else if (itemStack.getItem() instanceof EnderpearlItem && bih instanceof Player player) {
-            yuh = Projectile.spawnProjectileFromRotation(ThrownEnderpearl::new, serverLevel, itemStack, player, 0.0F, 1.5F*power, 1.0F);
+            if (projectileVeloBased) {
+                yuh = Projectile.spawnProjectile(new ThrownEnderpearl(serverLevel, bih, itemStack), serverLevel, itemStack, (pearl) -> {
+                    pearl.shoot(newVelo.x, newVelo.y, newVelo.z, 1.5f*power, 1f);
+                    pearl.setPos(position);
+                });
+            } else {
+                yuh = Projectile.spawnProjectileFromRotation(ThrownEnderpearl::new, serverLevel, itemStack, player, 0.0F, 1.5F*power, 1.0F);
+            }
         } else if (itemStack.getItem() instanceof EntitySpawnItemInterface entitySpawnItemInterface) {
             EntityType<?> type = entitySpawnItemInterface.ballistics$getSpawnEntity();
             Entity entity = type.create(serverLevel, EntitySpawnReason.EVENT);
@@ -407,22 +414,32 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                         itemStack1.set(DataComponents.BUNDLE_CONTENTS, newBundleContents);
                         livingEntity.setItemInHand(priority,ItemStack.EMPTY);
                         level().playSound(null,blockPosition(),SoundEvents.BUNDLE_INSERT,SoundSource.PLAYERS);
+                        spawnItemEntity(itemStack1);
+                        return true;
                     }
                 }
-                spawnItemEntity(itemStack1);
-                return true;
             } else if (!bundleContents.isEmpty()) {
                 List<ItemStackTemplate> list = new ArrayList<>(List.of());
                 boolean hasIgnition = false;
+                boolean hasFirework = false;
+                ItemStackTemplate ignition = null;
                 for (ItemStackTemplate itemStackTemplate : bundleContents.items()) {
-                    if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() <= 1)
+                    if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles)) {
                         hasIgnition = true;
-                    else if (!hasIgnition && itemStackTemplate.is(ModItems.ignitesFireworksInBundles) && itemStackTemplate.count() > 1) {
-                        hasIgnition = true;
-                        list.add(itemStackTemplate.withCount(itemStackTemplate.count() - 1));
+                        ignition = itemStackTemplate;
+                    } else if (itemStackTemplate.item().value() instanceof FireworkRocketItem) {
+                        hasFirework = true;
+                        list.add(itemStackTemplate);
                     } else {
                         list.add(itemStackTemplate);
                     }
+                }
+                if (ignition != null && hasFirework) {
+                    if (!ignition.create().has(DataComponents.MAX_DAMAGE)) {
+                        if (ignition.count() > 1) list.add(ignition.withCount(ignition.count() - 1));
+                    } else list.add(ignition);
+                } else if (ignition != null) {
+                    list.add(ignition);
                 }
                 for (ItemStackTemplate itemStackTemplate : list) {
                     ItemStack itemStack2 = itemStackTemplate.create();
@@ -440,8 +457,8 @@ public class ThrownItemProjectile extends ThrowableItemProjectile {
                                 velo,
                                 false,
                                 true,
-                                hasIgnition,
-                                1.0f
+                                hasIgnition && hasFirework,
+                                1f
                         );
                     }
                 }
